@@ -19,51 +19,92 @@ if (process.env.NODE_ENV === 'production') {
 const serviceUUID = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
 const rxUUID      = '6e400002-b5a3-f393-e0a9-e50e24dcca9e';
 const txUUID      = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
-const encoder     = new TextEncoder("utf-8");
+const encoder     = new TextEncoder();
 const decoder     = new TextDecoder("utf-8");
 
 // -- Util -- //
-const elm = (id) => document.getElementById(id);
+const elm = (id: string) => {
+    const el = document.getElementById(id);
+    if (!el) {
+        console.log('no element with id: ' + id)
+        throw 'error'
+    }
+    return el;
+};
 
-const sleeper = (ms) => (x) => 
-    new Promise(resolve => setTimeout(() => resolve(x), ms));
+// const sleeper = (ms: number) => <T>(x: T): Promise<T> => 
+//     new Promise(resolve => setTimeout(() => resolve(x), ms));
 
-function bleNotification(e) {
-    const val = decoder.decode(e.target.value);
-    elm("output").innerHTML = val;
+function bleNotification([
+    mcrs, red, infr, ratio, ambient, _1stDer, _2ndDer
+]: string[]) {
+    // const val = decoder.decode(e.target.value);
+    elm("output").innerHTML = `
+        <div>mrcs: ${mcrs}</div>
+        <div>red: ${red}</div>
+        <div>infr: ${infr}</div>
+        <div>ratio: ${ratio}</div>
+        <div>ambnt: ${ambient}</div>
+        <div>1st d: ${_1stDer}</div>
+        <div>2nd d: ${_2ndDer}</div>
+    `;
 }
 
-function updateDeviceStatus(device) {
+function updateDeviceStatus(device: BluetoothDevice) {
     setInterval(() => {
-        elm("device").innerHTML = device.name;
+        elm("device").innerHTML = device.name + '';
         elm("device-id").innerHTML = device.id;
-        elm("device-connected").innerHTML = device.gatt.connected;
+        elm("device-connected").innerHTML = device.gatt?.connected + '';
     }, 1000);
 }
 
-
 // -- Bluetooth -- //
-elm("bt").onclick = () => {
+async function connect() {
+    const btDevice = await navigator.bluetooth.requestDevice({
+        // acceptAllDevices: true,
+        filters: [{ namePrefix: 'HEG' }],
+        optionalServices: [serviceUUID]
+    });
 
-    navigator.bluetooth.requestDevice({
-        acceptAllDevices: true,
-        optionalServices: [serviceUUID] //
-    })
-    .then(device => {
-        updateDeviceStatus(device);
-        return device.gatt.connect(); //Connect to HEG
-    })
-    .then(sleeper(100)).then(server => server.getPrimaryService(serviceUUID))
-    .then(sleeper(100)).then(service => { 
-        // Send command to start HEG automatically (if not already started)
-        service.getCharacteristic(rxUUID).then(tx => tx.writeValue(encoder.encode("t")));
-        return service.getCharacteristic(txUUID) // Get stream source
-    })
-    // Subscribe to stream
-    .then(sleeper(100)).then(characteristic=> characteristic.startNotifications())
-    .then(sleeper(100)).then(characteristic =>
-        //Update page with each notification
-        characteristic.addEventListener('characteristicvaluechanged', bleNotification)
-    )
-    .catch(err => console.error(err));
+    updateDeviceStatus(btDevice);
+    
+    const btServer = await btDevice.gatt?.connect();
+    if (!btServer) throw 'no connection';
+
+    const service = await btServer.getPrimaryService(serviceUUID);
+
+    // Send command to start HEG automatically (if not already started)
+    const tx = await service.getCharacteristic(rxUUID)
+    await tx.writeValue(encoder.encode("t"));
+    
+    const characteristic = await service.getCharacteristic(txUUID);
+
+    let lastValue = decoder.decode(await characteristic.readValue());
+    let n = 0;
+    let time = new Date().getTime();
+
+    async function readVal(): Promise<any> {
+        const data = await characteristic.readValue();
+        const val = decoder.decode(data);
+        const arr = val.replace(/[\n\r]+/g, '').split('|');
+        // console.log(arr);
+
+        // only update on unique value
+        if (lastValue === val) return readVal();
+        n++;
+        lastValue = val;
+        const newTime = new Date().getTime();
+        if (time < (newTime - 1000)) {
+            elm('device-sps').innerHTML = n + '';
+            time = newTime;
+            n = 0;
+        }
+
+        bleNotification(arr);
+        readVal();
+    }
+
+    readVal();
 }
+
+elm("bt").onclick = () => connect();
