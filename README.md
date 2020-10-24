@@ -1,2 +1,0 @@
-# netlify_test
-bloop
