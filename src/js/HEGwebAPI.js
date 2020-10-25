@@ -2546,7 +2546,7 @@ export class bleUtils { //This is formatted for the way the HEG sends/receives i
         }
         return service.getCharacteristic(txUUID) // Get stream source
       })
-      .then(sleeper(100)).then(characteristic=>{
+      .then(sleeper(1100)).then(characteristic=>{
           this.txchar = characteristic;
           return characteristic.startNotifications(); // Subscribe to stream
       })
