@@ -1,6 +1,7 @@
 import {HEGwebAPI} from './HEGwebAPI'
 
-//ThreeJS App(s)
+//ThreeJS App(s) 
+/*
 var link1 = document.createElement("script");
 link1.src = "./js/three.min.js"; // Can set this to be a nonlocal link like from cloudflare or a special script with a custom app
 link1.async = false; // Load synchronously
@@ -10,6 +11,9 @@ var link2 = document.createElement("script");
 link2.src = "./js/postprocessing.min.js"; // Can set this to be a nonlocal link like from cloudflare or a special script with a custom app
 link2.async = false; // Load synchronously
 document.head.appendChild(link2); //Append script
+*/
+import * as THREE from 'three'
+import * as POSTPROCESSING from 'postprocessing'
 
 export class graphNode { //Use this to organize 3D models hierarchically if needed 
     constructor(parent=null, children=[null], id=null) {
