@@ -2535,11 +2535,12 @@ export class bleUtils { //This is formatted for the way the HEG sends/receives i
       .then(sleeper(100)).then(server => server.getPrimaryService(serviceUUID))
       .then(sleeper(100)).then(service => { 
         this.service = service;
+        if(this.android == true){
+          service.getCharaacteristic(rxUUID).then(sleeper(100)).then(tx => {
+            return tx.writeValue(this.encoder.encode("o")); // Fast output mode for android
+          });
           service.getCharacteristic(rxUUID).then(sleeper(100)).then(tx => {
             this.rxchar = tx;
-            if(this.android == true){
-              tx.writeValue(this.encoder.encode("o")); // Fast output mode
-            }
             return tx.writeValue(this.encoder.encode("t")); // Send command to start HEG automatically (if not already started)
           });
           return service.getCharacteristic(txUUID) // Get stream source
