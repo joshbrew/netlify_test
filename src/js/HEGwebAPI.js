@@ -1018,7 +1018,7 @@ export class circleJS {
   }
 }
 
-  class videoJS {
+export  class videoJS {
       constructor(res=["700","440"], parentId="main_body", vidapiId="vidapi", vidContainerId="vidbox", defaultUI=true){
         this.playRate = 1;
         this.alpha = 0;
@@ -1342,7 +1342,7 @@ export class circleJS {
      }
  }
  
- class audioJS { //Heavily modified from: https://codepen.io/jackfuchs/pen/yOqzEW
+export class audioJS { //Heavily modified from: https://codepen.io/jackfuchs/pen/yOqzEW
   constructor(res=[window.innerWidth,"800"], parentId="main_body", audioId="audio", audmenuId="audmenu", defaultUI=true) {
     this.audioId = audioId;
     this.audmenuId = audmenuId;
@@ -1793,7 +1793,7 @@ export class circleJS {
     }
  }
 
- class hillJS {
+export class hillJS {
   constructor(res=["1400","500"], updateInterval=2000, parentId="main_body", canvasId="hillscanvas", defaultUI=true, canvasmenuId="hillsmenu") {
    this.canvasId = canvasId;
    this.canvasmenuId = canvasmenuId;
@@ -2008,7 +2008,7 @@ export class circleJS {
   }
  }
 
- class textReaderJS {
+export class textReaderJS {
   constructor(text="this is a test", res=["800","400"], parentId="main_body", canvasId="textcanvas", defaultUI=true, canvasmenuId="textcanvasmenu") {
     this.text = text;
     this.canvasId = canvasId;
@@ -2107,7 +2107,7 @@ export class circleJS {
  }
 
  //Parse Audio file buffers
- class BufferLoader { //From HTML5 Rocks tutorial
+export class BufferLoader { //From HTML5 Rocks tutorial
    constructor(ctx, urlList, callback){
     this.ctx = ctx;
     this.urlList = urlList;
@@ -2209,7 +2209,7 @@ export class circleJS {
   
 }
 
- class SoundJS { //Only one Audio context at a time!
+export class SoundJS { //Only one Audio context at a time!
   constructor(){
     window.AudioContext = window.AudioContext || window.webkitAudioContext || window.mozAudioContext || window.msAudioContext;
     
@@ -2441,7 +2441,7 @@ export class circleJS {
  }
 
  
- class geolocateJS {
+export class geolocateJS {
     constructor(){
       if(navigator.geolocation){
         
