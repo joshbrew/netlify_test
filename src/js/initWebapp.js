@@ -1,7 +1,8 @@
 // Custom Scripts and UI setup, feedback modules must be manually linked to session event data (you can mix and match or write your own easily) 
 // Advanced Client scripts using external packages
+import {HEGwebAPI, graphJS, circleJS, videoJS, audioJS, hillJS, textReaderJS, BufferLoader, SoundJS, geolocateJS, bleUtils} from './HEGwebAPI'
+import {graphNode, ThreeGlobe} from './threeApp' 
 
- 
 // Initialize Session - undefined are default values
 var s = new HEGwebAPI('',undefined,undefined,undefined,undefined,false); //HEGduino
 //var s = new HEGwebAPI('',["us","Red","IR","Ambient","Ratio","HR","SPO2"],undefined,undefined,undefined,false); // Delobotomizer

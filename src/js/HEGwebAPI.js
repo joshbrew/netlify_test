@@ -1,4 +1,4 @@
-class HEGwebAPI { //Create HEG sessions, define custom data stream params as needed.
+export class HEGwebAPI { //Create HEG sessions, define custom data stream params as needed.
   constructor(host='', header=["us","Red","IR","Ratio","Ambient","Vel","Accel"], delimiter="|", uIdx=0, rIdx=3, defaultUI=true, parentId="main_body"){
     
     this.alloutput = [];
@@ -530,7 +530,7 @@ class HEGwebAPI { //Create HEG sessions, define custom data stream params as nee
   }
 }
 
-class graphJS {
+export class graphJS {
   constructor(nPoints=[1155], color=[0,255,0,1], yscale=1, res=[1400,600], parentId="main_body", canvasId="g", defaultUI=true){
     //WebGL graph based on: https://tinyurl.com/y5roydhe
     //HTML : <canvas id={canvasId}></canvas><canvas id={canvasId+"text"}></canvas>;
@@ -879,7 +879,7 @@ class graphJS {
   
 }
     
-class circleJS {
+export class circleJS {
   constructor(bgColor="#34baeb", cColor="#ff3a17", res=[window.innerWidth,"440"], parentId="main_body", canvasId="circlecanvas", defaultUI=true, canvasmenuId="circlecanvasmenu"){
     
     this.createCanvas(parentId, canvasId, res);
@@ -1018,7 +1018,7 @@ class circleJS {
   }
 }
 
-  class videoJS {
+export class videoJS {
       constructor(res=["700","440"], parentId="main_body", vidapiId="vidapi", vidContainerId="vidbox", defaultUI=true){
         this.playRate = 1;
         this.alpha = 0;
@@ -1342,7 +1342,7 @@ class circleJS {
      }
  }
  
- class audioJS { //Heavily modified from: https://codepen.io/jackfuchs/pen/yOqzEW
+export class audioJS { //Heavily modified from: https://codepen.io/jackfuchs/pen/yOqzEW
   constructor(res=[window.innerWidth,"800"], parentId="main_body", audioId="audio", audmenuId="audmenu", defaultUI=true) {
     this.audioId = audioId;
     this.audmenuId = audmenuId;
@@ -1793,7 +1793,7 @@ class circleJS {
     }
  }
 
- class hillJS {
+export class hillJS {
   constructor(res=["1400","500"], updateInterval=2000, parentId="main_body", canvasId="hillscanvas", defaultUI=true, canvasmenuId="hillsmenu") {
    this.canvasId = canvasId;
    this.canvasmenuId = canvasmenuId;
@@ -2008,7 +2008,7 @@ class circleJS {
   }
  }
 
- class textReaderJS {
+export class textReaderJS {
   constructor(text="this is a test", res=["800","400"], parentId="main_body", canvasId="textcanvas", defaultUI=true, canvasmenuId="textcanvasmenu") {
     this.text = text;
     this.canvasId = canvasId;
@@ -2107,7 +2107,7 @@ class circleJS {
  }
 
  //Parse Audio file buffers
- class BufferLoader { //From HTML5 Rocks tutorial
+export class BufferLoader { //From HTML5 Rocks tutorial
    constructor(ctx, urlList, callback){
     this.ctx = ctx;
     this.urlList = urlList;
@@ -2209,7 +2209,7 @@ class circleJS {
   
 }
 
- class SoundJS { //Only one Audio context at a time!
+export class SoundJS { //Only one Audio context at a time!
   constructor(){
     window.AudioContext = window.AudioContext || window.webkitAudioContext || window.mozAudioContext || window.msAudioContext;
     
@@ -2441,7 +2441,7 @@ class circleJS {
  }
 
  
- class geolocateJS {
+ export class geolocateJS {
     constructor(){
       if(navigator.geolocation){
         
@@ -2465,7 +2465,7 @@ class circleJS {
  }
 
 
- class bleUtils { //This is formatted for the way the HEG sends/receives information. Other BLE devices will likely need changes to this to be interactive.
+ export class bleUtils { //This is formatted for the way the HEG sends/receives information. Other BLE devices will likely need changes to this to be interactive.
    constructor(async = false, serviceUUID = '6e400001-b5a3-f393-e0a9-e50e24dcca9e', rxUUID = '6e400002-b5a3-f393-e0a9-e50e24dcca9e', txUUID = '6e400003-b5a3-f393-e0a9-e50e24dcca9e', defaultUI = true, parentId="main_body" , buttonId = "blebutton"){
     this.serviceUUID = serviceUUID;
     this.rxUUID      = rxUUID; //characteristic that can receive input from this device
