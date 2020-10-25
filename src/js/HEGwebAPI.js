@@ -2537,12 +2537,12 @@ export class bleUtils { //This is formatted for the way the HEG sends/receives i
         this.service = service;
         if(this.android == true){
           service.getCharaacteristic(rxUUID).then(sleeper(100)).then(tx => {
-            return tx.writeValue(this.encoder.encode("o\n")); // Fast output mode for android
+            return tx.writeValue(this.encoder.encode("o")); // Fast output mode for android
           });
         }
           service.getCharacteristic(rxUUID).then(sleeper(400)).then(tx => {
             this.rxchar = tx;
-            return tx.writeValue(this.encoder.encode("t\n")); // Send command to start HEG automatically (if not already started)
+            return tx.writeValue(this.encoder.encode("t")); // Send command to start HEG automatically (if not already started)
           });
           return service.getCharacteristic(txUUID) // Get stream source
       })
@@ -2597,9 +2597,9 @@ export class bleUtils { //This is formatted for the way the HEG sends/receives i
         // Send command to start HEG automatically (if not already started)
         const tx = await service.getCharacteristic(this.rxUUID);
         if(this.android == true){
-          await tx.writeValue(this.encoder.encode("o\n"));
+          await tx.writeValue(this.encoder.encode("o"));
         }
-        await tx.writeValue(this.encoder.encode("t\n"));
+        await tx.writeValue(this.encoder.encode("t"));
         
         this.characteristic = await service.getCharacteristic(this.txUUID);
          this.onConnectedCallback();
