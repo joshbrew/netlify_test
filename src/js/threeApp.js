@@ -1,3 +1,5 @@
+import HEGwebAPI from './HEGwebAPI'
+
 //ThreeJS App(s)
 var link1 = document.createElement("script");
 link1.src = "./js/three.min.js"; // Can set this to be a nonlocal link like from cloudflare or a special script with a custom app
