@@ -188,7 +188,7 @@ export class ThreeGlobe {
         this.scene.add( this.sunMesh );
 
         console.log(window.location.pathname);
-        var texUrl = './assets/textures/8k_earth_daymap.jpg'
+        var texUrl = require('../assets/textures/8k_earth_daymap.jpg');
 
         var textureLoader = new THREE.TextureLoader()
         //textureLoader.crossOrigin = "Anonymous"
@@ -196,11 +196,11 @@ export class ThreeGlobe {
         globetex.anisotropy = this.renderer.capabilities.getMaxAnisotropy();
 
         //var globebump = textureLoader.load('assets/textures/8k_earth_bump_map.tif');
-
-        var globeemissive = textureLoader.load('./assets/textures/8k_earth_nightmap.jpg')
+        
+        var globeemissive = textureLoader.load(require('../assets/textures/8k_earth_nightmap.jpg'))
         globeemissive.anisotropy = this.renderer.capabilities.getMaxAnisotropy();
 
-        var globemetal = textureLoader.load('./assets/textures/8k_earth_specular_map.tif');
+        var globemetal = textureLoader.load(require('../assets/textures/8k_earth_specular_map.tif'));
         globemetal.anisotropy = this.renderer.capabilities.getMaxAnisotropy();
 
 
@@ -230,7 +230,7 @@ export class ThreeGlobe {
 
         this.scene.add( this.sphereMesh );
 
-        var cloudtexUrl = "./assets/textures/clouds_8k.jpg";
+        var cloudtexUrl = require('../assets/textures/clouds_8k.jpg');
         var cloudtex = textureLoader.load(cloudtexUrl);
         cloudtex.anisotropy = this.renderer.capabilities.getMaxAnisotropy();
 
@@ -248,8 +248,8 @@ export class ThreeGlobe {
 
         this.scene.add(this.cloudMesh);
 
-        var moontexUrl = "./assets/textures/moon_4k.jpg";
-        var moondispUrl = "./assets/textures/moon_displace_4k.jpg"
+        var moontexUrl = require('../assets/textures/moon_4k.jpg');
+        var moondispUrl = require('../assets/textures/moon_displace_4k.jpg');
 
         var moontex = textureLoader.load(moontexUrl);
 
