@@ -1,57 +1,61 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <link rel="shortcut icon" href="/public/favicon.ico" />
-    <link rel="apple-touch-icon" href="/public/logo192.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#000000" />
-    <link rel="manifest" href="/manifest.webmanifest" />
-    <link href="./index.sass" rel="stylesheet">
-    <title>HEG ⍺</title>
+<meta charset="UTF-8">
+<link rel="shortcut icon" href="/public/favicon.ico" />
+<link rel="apple-touch-icon" href="/public/logo192.png" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#000000" />
+<link rel="manifest" href="/manifest.webmanifest" />
+<link href="./index.sass" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="./css/webDemoCSS.css">
+<link rel="stylesheet" type="text/css" href="./css/chromeExt.css">
+<script src="./js/serialUtils.js"></script>
+<script src="./js/HEGwebAPI.js"></script>
 </head>
 <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
-    <button id="bt"><i class="material-icons">bluetooth</i></button>
+  <title>HEG ⍺</title>
+  <div class="header">
+      <h1>HEG ALPHA Ver 0.0.11</h1>
+  </div>
+  <div id="serialContainer" class="serialContainer"><h3>Serial Devices:</h3><div id="serialmenu" class="serialmenu"></div></div>
 
-    <h3>Device: <span id='device'>--</span></h3>
-    <h3>ID: <span id='device-id'>--</span></h3>
-    <h3>Connected: <span id='device-connected'>--</span></h3>
-    <h4>SPS: <span id='device-sps'>--</span></h4>
+  <div id="main_body"></div>
+  <script src="./index.ts"></script>
+  
+<script src="./js/initWebapp.js"></script>
 
-    <div id="output"></div>
-    <script src="./index.ts"></script>
-    <script>
-        // https://developers.google.com/web/tools/workbox/modules/workbox-cli
-        // it is needed because parcel will not recognize this as a file and not precess in its manner
-        const sw = "./service-worker.js";
-    
-        navigator.serviceWorker
-          .register(sw)
-          .then(registration => {
-            registration.onupdatefound = () => {
-              const installingWorker = registration.installing;
-              if (installingWorker == null) {
-                return;
-              }
-              installingWorker.onstatechange = () => {
-                if (installingWorker.state === "installed") {
-                  if (navigator.serviceWorker.controller) {
-                    console.log(
-                      "New content is available and will be used when all " +
-                        "tabs for this page are closed. See https://bit.ly/CRA-PWA."
-                    );
-                  } else {
-                    console.log("Content is cached for offline use.");
-                  }
-                }
-              };
-            };
-          })
-          .catch(error => {
-            console.error("Error during service worker registration:", error);
-          });
-      </script>
+<script>
+  // https://developers.google.com/web/tools/workbox/modules/workbox-cli
+  // it is needed because parcel will not recognize this as a file and not precess in its manner
+  const sw = "./service-worker.js";
+
+  navigator.serviceWorker
+    .register(sw)
+    .then(registration => {
+      registration.onupdatefound = () => {
+        const installingWorker = registration.installing;
+        if (installingWorker == null) {
+          return;
+        }
+        installingWorker.onstatechange = () => {
+          if (installingWorker.state === "installed") {
+            if (navigator.serviceWorker.controller) {
+              console.log(
+                "New content is available and will be used when all " +
+                  "tabs for this page are closed. See https://bit.ly/CRA-PWA."
+              );
+            } else {
+              console.log("Content is cached for offline use.");
+            }
+          }
+        };
+      };
+    })
+    .catch(error => {
+      console.error("Error during service worker registration:", error);
+    });
+</script>
+
 </body>
 </html>
