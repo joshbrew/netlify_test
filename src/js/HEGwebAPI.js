@@ -4,7 +4,10 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
     this.alloutput = [];
     this.raw = [];
     this.filtered = [];
-    this.us= [];
+    
+    this.clock = [];
+    this.useMs = false;
+
     this.ratio=[];
 
     this.startTime=0;
@@ -62,7 +65,7 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
     this.alloutput = [];
     this.raw = [];
     this.filtered = [];
-    this.us = [];
+    this.clock = [];
     this.ratio = [];
     
     this.slowSMA = 0;
@@ -221,15 +224,15 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
   replayCSV() {
     if(this.csvIndex < 2){
       if(this.startTime == 0) { this.startTime = this.csvDat[this.csvIndex][0]}
-      this.us.push(parseInt(this.csvDat[this.csvIndex][0]));
+      this.clock.push(parseInt(this.csvDat[this.csvIndex][0]));
       this.ratio.push(parseFloat(this.csvDat[this.csvIndex][3]));
     }
     this.csvIndex++;
     if(this.csvIndex < this.csvDat.length - 1){
       if(this.startTime == 0) { this.startTime = this.csvDat[this.csvIndex][0]}
-      this.us.push(parseInt(this.csvDat[this.csvIndex][0]));
+      this.clock.push(parseInt(this.csvDat[this.csvIndex][0]));
       this.ratio.push(parseFloat(this.csvDat[this.csvIndex][3]));
-      if(this.us.length >= 2){
+      if(this.clock.length >= 2){
         this.handleScore();
         this.updateStreamRow(this.csvDat[this.csvIndex]);
       }
@@ -240,7 +243,8 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
       this.csvIndex = 0;
     }
     //this.endOfEvent();
-    setTimeout(() => {this.replayCSV();},(this.us[this.csvIndex]-this.us[this.csvIndex-1])*0.001); //Call until end of index.
+    if(this.useMs == true){ setTimeout(() => {this.replayCSV();},(this.clock[this.csvIndex]-this.clock[this.csvIndex-1])); } //Call until end of index.
+    else{ setTimeout(() => {this.replayCSV();},(this.clock[this.csvIndex]-this.clock[this.csvIndex-1])*0.001); } //Call until end of index.
   }
   
   openCSV() {
@@ -289,11 +293,11 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
         var dataArray = data.split(delimiter);
         var thisRatio = parseFloat(dataArray[rIdx]);
         if(thisRatio > 0) { 
-          if(this.startTime == 0) { this.startTime = parseInt(dataArray[0])}
-          this.us.push(parseInt(dataArray[uIdx]));
+          if(this.startTime == 0) { this.startTime = parseInt(dataArray[0]); }
+          this.clock.push(parseInt(dataArray[uIdx]));
           this.ratio.push(parseFloat(dataArray[rIdx]));
 
-          if(this.us.length > 5) { // SMA filtering for ratio
+          if(this.clock.length > 5) { // SMA filtering for ratio
             var temp = HEGwebAPI.sma(this.ratio.slice(this.ratio.length - 5, this.ratio.length), 5); 
             //console.log(temp);
             if((this.ratio[this.ratio.length - 1] < temp[4] * 0.7) || (this.ratio[this.ratio.length - 1] > temp[4] * 1.3)) {
@@ -433,8 +437,9 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
     this.makeStreamTable(header);
     
     document.getElementById("getTime").onclick = () => {
-      this.curIndex = this.us.length - 1;
-      document.getElementById("timestamp").innerHTML = (this.us[this.us.length - 1] * 0.000001).toFixed(2) + "s";
+      this.curIndex = this.clock.length - 1;
+      if(this.clockeMs == true) { this.clock[this.clock.length - 1] * 0.001).toFixed(2) + "s"; }
+      else { document.getElementById("timestamp").innerHTML = (this.clock[this.clock.length - 1] * 0.000001).toFixed(2) + "s"; }
     }
 
     document.getElementById("saveNote").onclick = () => {
@@ -548,7 +553,7 @@ export class graphJS {
           
     this.sampleRate = null;
     this.clock = 0;
-    this.usems = false; //Get input in microseconds instead
+    this.useMs = false; //Get input in microseconds instead
     this.ratio = 0;
     this.score = 0;
     this.viewing = 0;
@@ -842,11 +847,11 @@ export class graphJS {
     this.graphtext.font = "2em Arial";
 
     var seconds = 0;
-    if(this.usems == false){
-      seconds = Math.floor(this.clock*0.000001);
-    }
-    else{
+    if(this.useMs == true){
       seconds = Math.floor(this.clock*0.001);
+    }
+    else {
+      seconds = Math.floor(this.clock*0.000001);
     }
     var minutes = Math.floor(seconds*0.01667);
     seconds = seconds - minutes * 60
