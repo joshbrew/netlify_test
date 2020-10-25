@@ -1,6 +1,11 @@
 import { main } from './main'
 import * as serviceWorker from './service-worker';
 
+import 'regenerator-runtime/runtime'
+import "./js/HEGwebAPI.js"
+import "./js/threeApp.js"
+//import "./js/serialUtils.js"
+import "./js/initWebapp.js"
 
 main(); // import test
 

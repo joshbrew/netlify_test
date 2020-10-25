@@ -1018,7 +1018,7 @@ export class circleJS {
   }
 }
 
-export class videoJS {
+  class videoJS {
       constructor(res=["700","440"], parentId="main_body", vidapiId="vidapi", vidContainerId="vidbox", defaultUI=true){
         this.playRate = 1;
         this.alpha = 0;
@@ -1342,7 +1342,7 @@ export class videoJS {
      }
  }
  
-export class audioJS { //Heavily modified from: https://codepen.io/jackfuchs/pen/yOqzEW
+ class audioJS { //Heavily modified from: https://codepen.io/jackfuchs/pen/yOqzEW
   constructor(res=[window.innerWidth,"800"], parentId="main_body", audioId="audio", audmenuId="audmenu", defaultUI=true) {
     this.audioId = audioId;
     this.audmenuId = audmenuId;
@@ -1793,7 +1793,7 @@ export class audioJS { //Heavily modified from: https://codepen.io/jackfuchs/pen
     }
  }
 
-export class hillJS {
+ class hillJS {
   constructor(res=["1400","500"], updateInterval=2000, parentId="main_body", canvasId="hillscanvas", defaultUI=true, canvasmenuId="hillsmenu") {
    this.canvasId = canvasId;
    this.canvasmenuId = canvasmenuId;
@@ -2008,7 +2008,7 @@ export class hillJS {
   }
  }
 
-export class textReaderJS {
+ class textReaderJS {
   constructor(text="this is a test", res=["800","400"], parentId="main_body", canvasId="textcanvas", defaultUI=true, canvasmenuId="textcanvasmenu") {
     this.text = text;
     this.canvasId = canvasId;
@@ -2107,7 +2107,7 @@ export class textReaderJS {
  }
 
  //Parse Audio file buffers
-export class BufferLoader { //From HTML5 Rocks tutorial
+ class BufferLoader { //From HTML5 Rocks tutorial
    constructor(ctx, urlList, callback){
     this.ctx = ctx;
     this.urlList = urlList;
@@ -2209,7 +2209,7 @@ export class BufferLoader { //From HTML5 Rocks tutorial
   
 }
 
-export class SoundJS { //Only one Audio context at a time!
+ class SoundJS { //Only one Audio context at a time!
   constructor(){
     window.AudioContext = window.AudioContext || window.webkitAudioContext || window.mozAudioContext || window.msAudioContext;
     
@@ -2441,7 +2441,7 @@ export class SoundJS { //Only one Audio context at a time!
  }
 
  
- export class geolocateJS {
+ class geolocateJS {
     constructor(){
       if(navigator.geolocation){
         
@@ -2465,7 +2465,7 @@ export class SoundJS { //Only one Audio context at a time!
  }
 
 
- export class bleUtils { //This is formatted for the way the HEG sends/receives information. Other BLE devices will likely need changes to this to be interactive.
+export class bleUtils { //This is formatted for the way the HEG sends/receives information. Other BLE devices will likely need changes to this to be interactive.
    constructor(async = false, serviceUUID = '6e400001-b5a3-f393-e0a9-e50e24dcca9e', rxUUID = '6e400002-b5a3-f393-e0a9-e50e24dcca9e', txUUID = '6e400003-b5a3-f393-e0a9-e50e24dcca9e', defaultUI = true, parentId="main_body" , buttonId = "blebutton"){
     this.serviceUUID = serviceUUID;
     this.rxUUID      = rxUUID; //characteristic that can receive input from this device

@@ -9,7 +9,7 @@ link2.src = "./js/postprocessing.min.js"; // Can set this to be a nonlocal link 
 link2.async = false; // Load synchronously
 document.head.appendChild(link2); //Append script
 
-export class graphNode { //Use this to organize 3D models hierarchically if needed 
+class graphNode { //Use this to organize 3D models hierarchically if needed 
     constructor(parent=null, children=[null], id=null) {
         this.id = id;
         this.parent = parent; //Access/inherit parent object
@@ -87,7 +87,7 @@ export class graphNode { //Use this to organize 3D models hierarchically if need
     }
 }
 
-export class ThreeGlobe {
+class ThreeGlobe {
     constructor() {
         //ThreeJS 
         var rendererHTML = '<div id="threeContainer" class="canvasContainer"></div>';
