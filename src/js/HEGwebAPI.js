@@ -2539,6 +2539,7 @@ export class bleUtils { //This is formatted for the way the HEG sends/receives i
           service.getCharaacteristic(rxUUID).then(sleeper(100)).then(tx => {
             return tx.writeValue(this.encoder.encode("o")); // Fast output mode for android
           });
+        }
           service.getCharacteristic(rxUUID).then(sleeper(100)).then(tx => {
             this.rxchar = tx;
             return tx.writeValue(this.encoder.encode("t")); // Send command to start HEG automatically (if not already started)
