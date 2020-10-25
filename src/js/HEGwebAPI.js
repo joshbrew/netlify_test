@@ -2499,7 +2499,10 @@ class circleJS {
     }
     var HTMLtoAppend = '<button id="'+buttonId+'">BLE Connect</button>';
     HEGwebAPI.appendFragment(HTMLtoAppend,parentId);
-    document.getElementById(buttonId).onclick = () => { if(async === false) {this.initBLE();} else{this.initBLEasync();} }//this.initBLE()};
+    document.getElementById(buttonId).onclick = () => { 
+      if(async === false) {this.initBLE();} 
+      else{this.initBLEasync();} 
+    }
    }
 
    //Typical web BLE calls
