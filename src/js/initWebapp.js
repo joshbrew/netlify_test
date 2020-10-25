@@ -454,7 +454,7 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
 //------------------------Bluetooth LE Additions--------------------------
 //------------------------------------------------------------------------
 
-var ble = new bleUtils(false);
+var ble = new bleUtils(false); //set true for async mode (slower)
 
 ble.onNotificationCallback = (e) => {
 
