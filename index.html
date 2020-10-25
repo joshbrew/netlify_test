@@ -10,19 +10,41 @@
     <link href="./index.sass" rel="stylesheet">
     <title>HEG ⍺</title>
 </head>
-<body>
+<body id="main_body">
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
-    <button id="bt"><i class="material-icons">bluetooth</i></button>
-
-    <h3>Device: <span id='device'>--</span></h3>
-    <h3>ID: <span id='device-id'>--</span></h3>
-    <h3>Connected: <span id='device-connected'>--</span></h3>
-    <h4>SPS: <span id='device-sps'>--</span></h4>
-
-    <div id="output"></div>
-    <script src="./index.ts"></script>
+    <script src="./index.js"></script>
     <script>
+      
+    //appendId is the element Id you want to append this fragment to
+    function appendFragment(HTMLtoAppend, parentId) {
+
+    var fragment = document.createDocumentFragment();
+    var newDiv = document.createElement('div');
+    newDiv.innerHTML = HTMLtoAppend;
+    newDiv.setAttribute("id", parentId + '_child');
+
+    fragment.appendChild(newDiv);
+
+    document.getElementById(parentId).appendChild(fragment);
+    }
+
+    //delete selected fragment. Will delete the most recent fragment if Ids are shared.
+    function deleteFragment(parentId,fragmentId) {
+    var this_fragment = document.getElementById(fragmentId);
+    document.getElementById(parentId).removeChild(this_fragment);
+    }
+
+    var outputhtml = '<div id="output"></div>'
+
+    var pagehtml = '<div id="root"></div> \
+    <button id="bt"><i class="material-icons">bluetooth</i></button> \
+    <h3>Device: <span id="device">--</span></h3> \
+    <h3>ID: <span id="device-id">--</span></h3> \
+    <h3>Connected: <span id="device-connected">--</span></h3> '
+
+    appendFragment(pagehtml,"main_body");
+    appendFragment(outputhtml,"main_body");
+    
         // https://developers.google.com/web/tools/workbox/modules/workbox-cli
         // it is needed because parcel will not recognize this as a file and not precess in its manner
         const sw = "./service-worker.js";
