@@ -1,4 +1,4 @@
-import HEGwebAPI from './HEGwebAPI'
+import {HEGwebAPI} from './HEGwebAPI'
 
 //ThreeJS App(s)
 var link1 = document.createElement("script");
