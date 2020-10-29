@@ -20,6 +20,8 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
   // ------------------------------------------------------------------------
   
   var switchHTML = '<label class="switch"><input type="checkbox" id="togBtn"><div class="startslider round"></div></label>';
+
+  var connectHTML = '<button id="wifibutton">WiFi Device</button>';
   
   var tabHTML = '<div id="tabContainer"> \
     <button class="tablink" id="modal_opener">Data</button> \
@@ -57,6 +59,7 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
   
   HEGwebAPI.appendFragment(switchHTML, "main_body");
   HEGwebAPI.appendFragment(tabHTML, "main_body");
+  HEGwebAPI.appendFragment(connectHTML, "main_body");
   
   function attachModalListeners(modalElm, closemodal, overlay) {
     document.getElementById(closemodal).onclick = function() {toggleModal(modalElm, closemodal, overlay)};
@@ -73,9 +76,11 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
     // If modal is visible, hide it. Else, display it.
     if (currentState === 'none') {
       modalElm.style.display = 'block';
+      modalElm.style.opacity = '1.0';
       attachModalListeners(modalElm, closemodal, overlay);
     } else {
-      modalElm.style.display = 'none';  
+      modalElm.style.display = 'none';
+      modalElm.style.opacity = '0.0';  
       detachModalListeners(modalElm, closemodal, overlay);
     }
   }
@@ -95,12 +100,13 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
       document.getElementById('stopbutton').click();
     }
   }
+
   document.getElementById("togBtn").onchange = function(){toggleHEG(document.getElementById("togBtn"))};
-  
-  // ------------------------------------------------------------------------
-  // ------------------------------------------------------------------------
-  // ------------------------------------------------------------------------
- 
+
+  document.getElementById("wifibutton").onclick = () => {
+    document.getElementById("submithost").click();
+  }
+
   // ------------------------------------------------------------------------
   // ------------------------------------------------------------------------
   // ------------------------------------------------------------------------
@@ -123,9 +129,9 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
   var modeHTML = '<div class="menudiv" id="menudiv"> \
     Modes:<br> \
     <button class="button" id="canvasmode">Circle</button> \
-    <button class="button" id="videomode">Video</button> \
-    <button class="button" id="audiomode">Audio</button><br> \
-    <button class="button" id="hillmode">Hill Climb</button> \
+    <button class="button" id="videomode">Video</button><br> \
+    <button class="button" id="audiomode">Audio</button> \
+    <button class="button" id="hillmode">Hill Climb</button><br> \
     <button class="button" id="txtmode">Text Reader</button> \
     <button class="button" id="boidsmode">Birdoids</button> \
     </div>';
@@ -252,6 +258,9 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
   }
   
   s.endOfEvent = function() {
+    if(document.getElementById("togBtn").checked == false){
+      document.getElementById("togBtn").checked = true;
+    }
     if(g.xoffsetSlider.max < this.scoreArr.length){
       if(this.scoreArr.length % 20 == 0) { 
         g.xoffsetSlider.max = this.scoreArr.length - 3; // Need 2 vertices minimum
@@ -463,7 +472,7 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
   makeTooltip("xscaletd",[10,80],"Shrink or grow the graph on the x-axis");
   makeTooltip("yoffsettd",[10,110],"Scroll up or down on the y-axis of the graph.");
   makeTooltip("yscaletd",[10,160],"Shrink or grow the graph on the y-axis.");
-  makeTooltip("autoscaletd",[10,220],"Uncheck to manually scale the graph on the y-axis.");
+  makeTooltip("autoscaletd",[10,160],"Uncheck to manually scale the graph on the y-axis.");
   
   // Feedback options
   makeTooltip("canvasmode",[10,10],"Grow the circle and keep it big!");
@@ -477,11 +486,14 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
     makeTooltip("threemode",[300,10],"Turn the Earth! More coming!");
   }
 
+  makeTooltip("wifibutton",[-150,40],"Connect to a device via WiFi, make sure you are connected to its local server or enter its IP in the Data menu if it's on a host network.")
+
 //------------------------------------------------------------------------
 //------------------------Bluetooth LE Additions--------------------------
 //------------------------------------------------------------------------
 
-var ble = new bleUtils(false)
+var ble = new bleUtils(false);
+makeTooltip("blebutton",[-150,40],"Connect to a device via Bluetooth LE!")
 
 ble.onNotificationCallback = (e) => {
 
@@ -524,8 +536,8 @@ ble.onConnectedCallback = () => {
   if(ble.android === true){
     s.header=["ms","Red","IR","Ratio"];
     s.updateStreamHeader();
-    g.useMs = true;
     s.useMs = true;
+    g.usems = true;
   }
   document.getElementById("startbutton").onclick = () => {
     ble.sendMessage('t');
@@ -541,20 +553,20 @@ ble.onConnectedCallback = () => {
 ble.onDisconnected = () => {
   if(ble.android == true){
     s.header=["us","Red","IR","Ratio","Ambient","drdt","ddrdt"]; //try to reset the header in case of reconnecting through a different protocol
-    s.updateStreamHeader()
-    g.useMs = false;
+    s.updateStreamHeader();
     s.useMs = false;
+    g.useMs = false;
   }
   console.log("BLE Device disconnected!");
 }
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
-/*
+
 //------------------------------------------------------------------------
 //----------------------Chrome Extension Additions------------------------
 //------------------------------------------------------------------------
-
+/*
 var serialHTML = '<div id="serialContainer" class="serialContainer"><h3>Serial Devices:</h3><div id="serialmenu" class="serialmenu"></div></div>';
 HEGwebAPI.appendFragment(serialHTML,"main_body");
 
@@ -595,8 +607,9 @@ serialMonitor.finalCallback = () => { //Set this so USB devices bind to the inte
 }
 
 makeTooltip("serialContainer",[-220,10],"Click 'Get' to get available Serial devices and 'Set' to pair it with the interface. Right click and press 'Inspect' to see debug output in the Console");
-
-//------------------------------------------------------------------------
-//------------------------------------------------------------------------
-//------------------------------------------------------------------------
 */
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+

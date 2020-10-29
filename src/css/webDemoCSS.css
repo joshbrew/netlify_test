@@ -4,14 +4,15 @@
 
 #blebutton {
   position: absolute;
-  top: 25px;
+  cursor: pointer;
+  top: 35px;
   right: 120px;
   height: 34px;
   opacity: 0.3;
   background-color: black;
   color: white;
   border: 2px ridge gray;
-  transition: all 0.5s ease-in-out;
+  transition: all 0.2s ease-in-out;
 }
 
 #blebutton:active {
@@ -22,11 +23,28 @@
   opacity: 1.0; 
 }
 
-#title {
-  position: fixed;
-  bottom: 10px;
-  float: right;
+#wifibutton {
+  position: absolute;
+  cursor: pointer;
+  top: 35px;
+  right: 230px;
+  height: 34px;
+  opacity: 0.3;
+  background-color: black;
+  color: white;
+  border: 2px ridge gray;
+  transition: all 0.2s ease-in-out;
 }
+
+#wifibutton:active {
+  background-color: darkblue;
+} 
+
+#wifibutton:hover {
+  opacity: 1.0; 
+}
+
+
 
 body{
   min-width: 700px;
@@ -40,32 +58,48 @@ h1 {
 .button {
   font-family: Console, Lucida, monospace;
   color: black;
-  float: left;
   border: 1px solid gray;
   outline: none;
   cursor: pointer;
   padding: 14px 12px;
   border-radius: 4px;
   font-size: 1.6em;
-  width: 50%;
+  width: 49%;
   background-color: white;
+  transition: all 0.2s ease-in-out;
 } 
 
 .button:hover {
-    background-color: rgba(0, 189, 157, 0.644);
+    background-color: rgba(0, 189, 157, 1);
 }
 
 .button:active {
-    background-color: rgba(0, 107, 89, 0.644)
+    background-color: rgba(83, 255, 226, 1);
+    padding: 14px 9px;
 }
 
+
 .header {
+  position: fixed;
+  top: 0px;
+  float: left;
   width: 50%;
   color: white;
   font-size: .5em;
   text-align: left;
   font-family: 'Ibarra Real Nova', serif;
+  animation: headerfade 3s;
+  animation-fill-mode: forwards;
+  z-index: 999;
+  pointer-events: none;
 }
+
+@keyframes headerfade {
+  0% { opacity: 1.0;}
+  100% { opacity: 0.0;
+          display: none; }
+} 
+
 .dummy {
     width:0;
     height:0;
@@ -404,14 +438,15 @@ h1 {
     }
     
     .feedbackboxmodal {
-      top: 150px;
+      top: 110px;
+      width: 500px;
     }
 
 /**Toggle Switch**/
 .switch {
     position: absolute;
     right: 16px;
-    top: 25px;
+    top: 35px;
     display: inline-block;
     width: 90px;
     height: 34px;
