@@ -14,6 +14,12 @@
   opacity: 1.0;
 }
 
+#title {
+  position: fixed;
+  bottom: 10px;
+  float: right;
+}
+
 body{
   min-width: 700px;
 }
@@ -291,6 +297,7 @@ h1 {
 .hilltable button {
   width: 100%;
 }
+
  .textreadercss {
   top: 100px;
   width: 90%;
@@ -299,6 +306,7 @@ h1 {
   min-width: 600px;
   z-index: 0;
  }
+
  .textmenu {
    position: absolute;
    top: 110px;
