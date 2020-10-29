@@ -36,9 +36,6 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
     this.delimiter = delimiter; //Data stream delimiter
     this.uIdx = uIdx; //Index of timing value (microseconds presumed)
     this.rIdx = rIdx; //Index of HEG Ratio
-
-    window.requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.msRequestAnimationFrame;
-    window.cancelAnimationFrame = window.cancelAnimationFrame || window.webkitCancelAnimationFrame || window.mozCancelAnimationFrame || window.msCancelAnimationFrame;
     
     this.defaultUI = defaultUI;
     this.ui = false;
