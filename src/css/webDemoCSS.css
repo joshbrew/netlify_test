@@ -394,7 +394,7 @@ h1 {
 .switch {
     position: absolute;
     right: 16px;
-    top: 95px;
+    top: 10px;
     display: inline-block;
     width: 90px;
     height: 34px;
