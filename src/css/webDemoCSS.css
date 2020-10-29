@@ -4,9 +4,9 @@
 
 #blebutton {
   position: absolute;
-  top: 20px;
-  right: 150px;
-  height: 30px;
+  top: 25px;
+  right: 120px;
+  height: 34px;
   opacity: 0.3;
   background-color: black;
   color: white;
@@ -411,11 +411,17 @@ h1 {
 .switch {
     position: absolute;
     right: 16px;
-    top: 10px;
+    top: 25px;
     display: inline-block;
     width: 90px;
     height: 34px;
     z-index: 990;
+    opacity: 0.2;
+    transition: all 0.5s ease-in-out;
+}
+
+.switch:hover{
+  opacity:1.0;
 }
 
     .switch input {
