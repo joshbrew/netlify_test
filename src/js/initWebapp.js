@@ -1,4 +1,4 @@
-import { HEGwebAPI, graphJS, circleJS, audioJS, videoJS, hillJS, textReaderJS, BufferLoader, SoundJS, geolocateJS, bleUtils  } from './HEGwebAPI'
+import { HEGwebAPI, graphJS, circleJS, audioJS, videoJS, hillJS, textReaderJS, boidsJS, Particles, BufferLoader, SoundJS, geolocateJS, bleUtils  } from './HEGwebAPI'
 import { graphNode, ThreeGlobe } from './threeApp'
 // Custom Scripts and UI setup, feedback modules must be manually linked to session event data (you can mix and match or write your own easily) 
 // Advanced Client scripts using external packages
@@ -101,6 +101,10 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
   // ------------------------------------------------------------------------
   // ------------------------------------------------------------------------
  
+  // ------------------------------------------------------------------------
+  // ------------------------------------------------------------------------
+  // ------------------------------------------------------------------------
+ 
   // Initialize Graph
   var g = new graphJS(1155,[255,100,80,1],1.0,[1400,600], "main_body", "g", false); // This could be swapped for a superior graphing package
   
@@ -113,6 +117,7 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
   var a = null;
   var h = null;
   var txt = null;
+  var boids = null;
   
   
   var modeHTML = '<div class="menudiv" id="menudiv"> \
@@ -122,6 +127,7 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
     <button class="button" id="audiomode">Audio</button><br> \
     <button class="button" id="hillmode">Hill Climb</button> \
     <button class="button" id="txtmode">Text Reader</button> \
+    <button class="button" id="boidsmode">Birdoids</button> \
     </div>';
 
   HEGwebAPI.appendFragment(modeHTML,"visualBox");
@@ -160,6 +166,14 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
       txt = new textReaderJS();
     }
   }
+
+  document.getElementById("boidsmode").onclick = function() {
+    if(boids == null){
+      deInitMode();
+      boids = new boidsJS();
+      boids.boidsMul = 0.1;
+    }
+  }
   
   // ------------------------------------------------------------------------
   // ------------------------------------------------------------------------
@@ -171,7 +185,7 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
   
     var threeApp = null;
   
-    var threeModeHTML = '<button class="button" id="threemode">ThreeJS</button>';
+    var threeModeHTML = '<button class="button" id="threemode">Sunrise</button>';
     HEGwebAPI.appendFragment(threeModeHTML,"menudiv");
   
     document.getElementById("threemode").onclick = function() {
@@ -213,6 +227,9 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
       }
       if(txt != null) {
         txt.onData(score);
+      }
+      if(boids != null) {
+        boids.onData(score);
       }
       if(useAdvanced) { // Score handling for advanced scripts
         if(threeApp != null) {
@@ -275,6 +292,10 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
       HEGwebAPI.removeParent(txt.canvasmenuId);
       txt = null;
     }
+    if(boids != null){
+      boids.deInit();
+      HEGwebAPI.removeParentParent(boids.canvasId);
+    }
     if(useAdvanced) { // Score handling for advanced scripts
       if(threeApp != null) {
         threeApp.destroyThreeApp();
@@ -307,6 +328,10 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
     if(txt != null) {
       deInitMode();
       txt = new textReaderJS();
+    }
+    if(boids != null){
+      deInitMode();
+      boids = new boidsJS();
     }
     if(useAdvanced){
       if(threeApp != null) {
@@ -446,6 +471,7 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
   makeTooltip("txtmode",[10,10],"Scroll the text to the right to keep reading!");
   makeTooltip("videomode",[300,10],"Control a video through various means! Use MP4 files.");
   makeTooltip("hillmode",[300,10],"Climb the mountain!");
+  makeTooltip("boidsmode",[300,10],"Make the boids swirl together!");
   
   if(useAdvanced == true){
     makeTooltip("threemode",[300,10],"Turn the Earth! More coming!");
