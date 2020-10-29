@@ -2288,6 +2288,12 @@ onData(score){
 
 draw = () => {
   var success = this.calcBoids();
+
+  var anchorTick = performance.now()*0.0001;
+  var newAnchor = Math.cos(anchorTick) + Math.sin(anchorTick)*Math.sin(anchorTick)
+
+  this.swirlAnchor;
+
   if(success == true){
     this.lastFrame = this.thisFrame;
     this.thisFrame = performance.now();

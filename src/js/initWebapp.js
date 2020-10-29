@@ -171,7 +171,6 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
     if(boids == null){
       deInitMode();
       boids = new boidsJS();
-      boids.boidsMul = 0.1;
     }
   }
   
