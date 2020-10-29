@@ -4,11 +4,18 @@
 
 #blebutton {
   position: absolute;
-  top: 1px;
-  right: 75px;
+  top: 20px;
+  right: 150px;
   height: 30px;
   opacity: 0.3;
+  background-color: black;
+  color: white;
+  border: 2px ridge gray;
 }
+
+#blebutton:active {
+  background-color: darkblue;
+} 
 
 #blebutton:hover {
   opacity: 1.0;
@@ -396,7 +403,7 @@ h1 {
     }
     
     .feedbackboxmodal {
-      top: 200px;
+      top: 150px;
     }
 
 /**Toggle Switch**/
@@ -490,6 +497,7 @@ body, html {
     font-family: 'Courier New', Courier, monospace;
     font-weight: bold;
     color: white;
+    top: 20px;
     float: left;
     border: none;
     border-style: outset;
