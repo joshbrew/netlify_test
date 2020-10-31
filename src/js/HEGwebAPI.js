@@ -2120,7 +2120,7 @@ export class textReaderJS {
   }
 }
 
-export  class boidsJS { //Birdoids Swarm AI. https://en.wikipedia.org/wiki/Boids 
+export class boidsJS { //Birdoids Swarm AI. https://en.wikipedia.org/wiki/Boids 
     constructor(boidsCount = 200, res=[window.innerWidth,"440"], parentId="main_body", canvasId="boidscanvas", defaultUI=true, canvasmenuId="boidscanvasmenu") {
 
       this.parentId = parentId;
@@ -2141,7 +2141,7 @@ export  class boidsJS { //Birdoids Swarm AI. https://en.wikipedia.org/wiki/Boids
 
       this.dragMul = 0.1;
       this.cohesionMul = 0.01; //Force toward mean position of group
-      this.alignmentMul = 0.1; //Force perpendicular to mean direction of group
+      this.alignmentMul = 0.5; //Force perpendicular to mean direction of group
       this.separationMul = 3; //Force away from other boids group members, multiplied by closeness.
       this.swirlMul = 0.0005; //Positive = Clockwise rotation about an anchor point
       this.attractorMul = 0.003;
@@ -2278,7 +2278,7 @@ export  class boidsJS { //Birdoids Swarm AI. https://en.wikipedia.org/wiki/Boids
   }
 
   onData(score){
-    this.swirlMul += score*0.00001;
+    this.swirlMul += score*0.0003;
     if(this.swirlMul < 0) {
       this.swirlMul = 0;
     }
@@ -2291,8 +2291,8 @@ export  class boidsJS { //Birdoids Swarm AI. https://en.wikipedia.org/wiki/Boids
     var success = this.calcBoids();
     if(success == true){
           //Moving anchor
-      var anchorTick = performance.now()*0.0001;
-      var newAnchor = [Math.sin(anchorTick)*Math.sin(anchorTick)*this.renderer.canvas.width*0.2+this.renderer.canvas.width*0.25, Math.cos(anchorTick)*this.renderer.canvas.height*0.1+this.renderer.canvas.height*0.4, 0];
+      var anchorTick = performance.now()*0.00005;
+      var newAnchor = [Math.sin(anchorTick)*Math.sin(anchorTick)*this.renderer.canvas.width*0.3+this.renderer.canvas.width*0.2, this.renderer.canvas.height*0.3, 0];
     
       this.swirlAnchor = newAnchor;
       this.attractorAnchor = newAnchor;
@@ -2321,215 +2321,215 @@ export  class boidsJS { //Birdoids Swarm AI. https://en.wikipedia.org/wiki/Boids
 }
 
 export class Particles { //Adapted from this great tutorial: https://modernweb.com/creating-particles-in-html5-canvas/
-  constructor(useDefaultAnim = true, maxParticles = 100, res=[window.innerWidth,"440"], parentId="main_body", canvasId="particlecanvas", defaultUI=true, canvasmenuId="particlecanvas") {
+    constructor(useDefaultAnim = true, maxParticles = 100, res=[window.innerWidth,"440"], parentId="main_body", canvasId="particlecanvas", defaultUI=true, canvasmenuId="particlecanvas") {
 
-    this.canvasId = canvasId;
-    this.parentId = parentId;
-    this.defaultUI = defaultUI;
-    this.canvasmenuId = canvasmenuId;
+      this.canvasId = canvasId;
+      this.parentId = parentId;
+      this.defaultUI = defaultUI;
+      this.canvasmenuId = canvasmenuId;
 
-    var canvasHTML = '<div id="canvasContainer" class="canvasContainer"> \
-    <canvas class="boidscss" id="'+this.canvasId+'" width="'+res[0]+'" height="'+res[1]+'"></canvas> \
-    ';
+      var canvasHTML = '<div id="canvasContainer" class="canvasContainer"> \
+      <canvas class="boidscss" id="'+this.canvasId+'" width="'+res[0]+'" height="'+res[1]+'"></canvas> \
+      ';
 
-    HEGwebAPI.appendFragment(canvasHTML, this.parentId);
-   
-    this.canvas = document.getElementById(this.canvasId);
-    this.context = this.canvas.getContext("2d");
+      HEGwebAPI.appendFragment(canvasHTML, this.parentId);
+     
+      this.canvas = document.getElementById(this.canvasId);
+      this.context = this.canvas.getContext("2d");
 
-    this.animationId = null;
-    this.lastFrame = 0;
-    this.thisFrame = 0;
-    this.frameRate = 1;
+      this.animationId = null;
+      this.lastFrame = 0;
+      this.thisFrame = 0;
+      this.frameRate = 1;
 
-    this.useDefaultAnim = useDefaultAnim;
+      this.useDefaultAnim = useDefaultAnim;
 
-    // Inital starting position
-    this.posX = 20;
-    this.posY = this.canvas.height / 2;
+      // Inital starting position
+      this.posX = 20;
+      this.posY = this.canvas.height / 2;
 
-    // No longer setting velocites as they will be random
-    // Set up object to contain particles and set some default values
-    this.particles = [];
-    this.particleIndex = 0;
-    this.settings = {
-          maxParticles: maxParticles,
-          particleSize: 5,
-          startingX: this.canvas.width / 2, 
-          startingY: this.canvas.height / 4,
-          maxSpeed: 3, 
-          xBounce: -1,
-          yBounce: -1,
-          gravity: 0.0,
-          maxLife: Infinity,
-          groundLevel: this.canvas.height * 0.999,
-          leftWall: this.canvas.width * 0.001,
-          rightWall: this.canvas.width * 0.999,
-          ceilingWall: this.canvas.height * 0.001
-        };
-
-    //for default anim
-    // To optimise the previous script, generate some pseudo-random angles
-    this.seedsX = [];
-    this.seedsY = [];
-    this.currentAngle = 0;
-
-    if(this.useDefaultAnim == true){
-      this.seedAngles();     // Start off with 100 angles ready to go
-    }
-
-    this.animationId = requestAnimationFrame(this.draw);
-    
-  }
-
-  seedAngles() {
-    this.seedsX = [];
-    this.seedsY = [];
-    for (var i = 0; i < this.settings.maxParticles; i++) {
-      this.seedsX.push(Math.random() * 20 - 10);
-      this.seedsY.push(Math.random() * 30 - 10);
-    }
-  }
-
-  // Set up a function to create multiple particles
-  genParticle() {
-    if (this.particleIndex !== this.settings.maxParticles) {
-      var newParticle = {};
-      
-      newParticle.x = this.settings.startingX;
-      newParticle.y = this.settings.startingY;
-      newParticle.vx = 0;
-      newParticle.vy = 0;
-      // Establish starting positions and velocities
-      if(this.useDefaultAnim == true){
-        newParticle.vx = this.seedsX[this.currentAngle];
-        newParticle.vy = this.seedsY[this.currentAngle];
-        this.currentAngle++;
-      }
-
-      // Add new particle to the index
-      // Object used as it's simpler to manage that an array
-    
-      newParticle.id = this.particleIndex;
-      newParticle.life = 0;
-      newParticle.maxLife = this.settings.maxLife;
-
-      this.particles[this.particleIndex] = newParticle;
-
-      this.particleIndex++;
-    } else {
-      if(this.useDefaultAnim == true){
-        //console.log('Generating more seed angles');
-        this.seedAngles();
-        this.currentAngle = 0;
-      }
+      // No longer setting velocites as they will be random
+      // Set up object to contain particles and set some default values
+      this.particles = [];
       this.particleIndex = 0;
-    }
-  }
+      this.settings = {
+            maxParticles: maxParticles,
+            particleSize: 5,
+            startingX: this.canvas.width / 2, 
+            startingY: this.canvas.height / 4,
+            maxSpeed: 3, 
+            xBounce: -1,
+            yBounce: -1,
+            gravity: 0.0,
+            maxLife: Infinity,
+            groundLevel: this.canvas.height * 0.999,
+            leftWall: this.canvas.width * 0.001,
+            rightWall: this.canvas.width * 0.999,
+            ceilingWall: this.canvas.height * 0.001
+          };
 
-  normalize2D(vec2 = []) {
-    var normal = Math.sqrt(Math.pow(vec2[0],2)+Math.pow(vec2[1],2));
-    return [vec2[0]/normal,vec2[1]/normal];
-  }
+      //for default anim
+      // To optimise the previous script, generate some pseudo-random angles
+      this.seedsX = [];
+      this.seedsY = [];
+      this.currentAngle = 0;
 
-  // Keep particles within walls
-  updateParticle = (i) => {
-    
-    this.particles[i].x += this.particles[i].vx+this.particles[i].vx*this.frameRate;
-    this.particles[i].y += this.particles[i].vy+this.particles[i].vx*this.frameRate;
-  
-    if((this.particles[i].vx > this.settings.maxSpeed) || (this.particles[i].vy > this.settings.maxSpeed) || (this.particles[i].vx < -this.settings.maxSpeed) || (this.particles[i].vy < -this.settings.maxSpeed)) {
-      var normalized = this.normalize2D([this.particles[i].vx,this.particles[i].vy]);
-      this.particles[i].vx = normalized[0]*this.settings.maxSpeed;
-      this.particles[i].vy = normalized[1]*this.settings.maxSpeed;
-    }
-    
-    // Give the particle some bounce
-    if ((this.particles[i].y + this.settings.particleSize) > this.settings.groundLevel) {
-      this.particles[i].vy *= this.settings.yBounce;
-      this.particles[i].vx *= -this.settings.xBounce;
-      this.particles[i].y = this.settings.groundLevel - this.settings.particleSize;
-    }
+      if(this.useDefaultAnim == true){
+        this.seedAngles();     // Start off with 100 angles ready to go
+      }
 
-    // Give the particle some bounce
-    if ((this.particles[i].y - this.settings.particleSize) < this.settings.ceilingWall) {
-      this.particles[i].vy *= this.settings.yBounce;
-      this.particles[i].vx *= -this.settings.xBounce;
-      this.particles[i].y = this.settings.ceilingWall + this.settings.particleSize;
+      this.animationId = requestAnimationFrame(this.draw);
+      
     }
 
-    // Determine whether to bounce the particle off a wall
-    if (this.particles[i].x - (this.settings.particleSize) <= this.settings.leftWall) {
-      this.particles[i].vx *= this.settings.xBounce;
-      this.particles[i].x = this.settings.leftWall + (this.settings.particleSize);
-    }
-
-    if (this.particles[i].x + (this.settings.particleSize) >= this.settings.rightWall) {
-      this.particles[i].vx *= this.settings.xBounce;
-      this.particles[i].x = this.settings.rightWall - this.settings.particleSize;
-    }
-
-    // Adjust for gravity
-    this.particles[i].vy += this.settings.gravity;
-
-    // Age the particle
-    this.particles[i].life++;
-
-    // If Particle is old, it goes in the chamber for renewal
-    if (this.particles[i].life >= this.particles[i].maxLife) {
-      this.particles.splice(i,1);
-    }
-
-  }
-
-  deInit() {
-   cancelAnimationFrame(this.animationId);
-  }
-
-  draw = () => {
-    this.lastFrame = this.thisFrame;
-    this.thisFrame = performance.now();
-    this.frameRate = (this.thisFrame - this.lastFrame) * 0.001; //Framerate in seconds
-
-    this.context.fillStyle = "rgba(10,10,10,0.8)";
-    this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-    // Draw a left, right walls and floor
-    this.context.fillStyle = "red";
-    this.context.fillRect(0, 0, this.settings.leftWall, this.canvas.height);
-    this.context.fillRect(this.settings.rightWall, 0, this.canvas.width, this.canvas.height);
-    this.context.fillRect(0, this.settings.groundLevel, this.canvas.width, this.canvas.height);
-    this.context.fillRect(0, 0, this.canvas.width, this.settings.ceilingWall);
-    
-    
-    // Draw the particles
-    if(this.particles.length < this.settings.maxParticles) {
-      for (var i = 0; i < (this.settings.maxParticles - this.particles.length); i++) {
-        this.genParticle();
-        //console.log(this.particles[i]);
+    seedAngles() {
+      this.seedsX = [];
+      this.seedsY = [];
+      for (var i = 0; i < this.settings.maxParticles; i++) {
+        this.seedsX.push(Math.random() * 20 - 10);
+        this.seedsY.push(Math.random() * 30 - 10);
       }
     }
 
+    // Set up a function to create multiple particles
+    genParticle() {
+      if (this.particleIndex !== this.settings.maxParticles) {
+        var newParticle = {};
+        
+        newParticle.x = this.settings.startingX;
+        newParticle.y = this.settings.startingY;
+        newParticle.vx = 0;
+        newParticle.vy = 0;
+        // Establish starting positions and velocities
+        if(this.useDefaultAnim == true){
+          newParticle.vx = this.seedsX[this.currentAngle];
+          newParticle.vy = this.seedsY[this.currentAngle];
+          this.currentAngle++;
+        }
 
-    for (var i in this.particles) {
-      this.updateParticle( i );
-      // Create the shapes
-      //context.fillStyle = "red";
-      //context.fillRect(this.x, this.y, settings.particleSize, settings.particleSize);
-      this.context.clearRect(this.settings.leftWall, this.settings.groundLevel, this.canvas.width, this.canvas.height);
-      this.context.beginPath();
-      this.context.fillStyle="rgb("+String(Math.abs(this.particles[i].vx)*75)+","+String(Math.abs(this.particles[i].vx)*25)+","+String(255 - Math.abs(this.particles[i].vx)*75)+")";
-      // Draws a circle of radius 20 at the coordinates 100,100 on the canvas
-      this.context.arc(this.particles[i].x, this.particles[i].y, this.settings.particleSize, 0, Math.PI*2, true); 
-      this.context.closePath();
-      this.context.fill();
+        // Add new particle to the index
+        // Object used as it's simpler to manage that an array
+      
+        newParticle.id = this.particleIndex;
+        newParticle.life = 0;
+        newParticle.maxLife = this.settings.maxLife;
+
+        this.particles[this.particleIndex] = newParticle;
+
+        this.particleIndex++;
+      } else {
+        if(this.useDefaultAnim == true){
+          //console.log('Generating more seed angles');
+          this.seedAngles();
+          this.currentAngle = 0;
+        }
+        this.particleIndex = 0;
+      }
     }
 
-    setTimeout(() => {this.animationId = requestAnimationFrame(this.draw)},20);
-  }
+    normalize2D(vec2 = []) {
+      var normal = Math.sqrt(Math.pow(vec2[0],2)+Math.pow(vec2[1],2));
+      return [vec2[0]/normal,vec2[1]/normal];
+    }
+
+    // Keep particles within walls
+    updateParticle = (i) => {
+      
+      this.particles[i].x += this.particles[i].vx+this.particles[i].vx*this.frameRate;
+      this.particles[i].y += this.particles[i].vy+this.particles[i].vx*this.frameRate;
+    
+      if((this.particles[i].vx > this.settings.maxSpeed) || (this.particles[i].vy > this.settings.maxSpeed) || (this.particles[i].vx < -this.settings.maxSpeed) || (this.particles[i].vy < -this.settings.maxSpeed)) {
+        var normalized = this.normalize2D([this.particles[i].vx,this.particles[i].vy]);
+        this.particles[i].vx = normalized[0]*this.settings.maxSpeed;
+        this.particles[i].vy = normalized[1]*this.settings.maxSpeed;
+      }
+      
+      // Give the particle some bounce
+      if ((this.particles[i].y + this.settings.particleSize) > this.settings.groundLevel) {
+        this.particles[i].vy *= this.settings.yBounce;
+        this.particles[i].vx *= -this.settings.xBounce;
+        this.particles[i].y = this.settings.groundLevel - this.settings.particleSize;
+      }
+
+      // Give the particle some bounce
+      if ((this.particles[i].y - this.settings.particleSize) < this.settings.ceilingWall) {
+        this.particles[i].vy *= this.settings.yBounce;
+        this.particles[i].vx *= -this.settings.xBounce;
+        this.particles[i].y = this.settings.ceilingWall + this.settings.particleSize;
+      }
+
+      // Determine whether to bounce the particle off a wall
+      if (this.particles[i].x - (this.settings.particleSize) <= this.settings.leftWall) {
+        this.particles[i].vx *= this.settings.xBounce;
+        this.particles[i].x = this.settings.leftWall + (this.settings.particleSize);
+      }
+
+      if (this.particles[i].x + (this.settings.particleSize) >= this.settings.rightWall) {
+        this.particles[i].vx *= this.settings.xBounce;
+        this.particles[i].x = this.settings.rightWall - this.settings.particleSize;
+      }
+
+      // Adjust for gravity
+      this.particles[i].vy += this.settings.gravity;
+
+      // Age the particle
+      this.particles[i].life++;
+
+      // If Particle is old, it goes in the chamber for renewal
+      if (this.particles[i].life >= this.particles[i].maxLife) {
+        this.particles.splice(i,1);
+      }
+
+    }
+
+    deInit() {
+     cancelAnimationFrame(this.animationId);
+    }
+
+    draw = () => {
+      this.lastFrame = this.thisFrame;
+      this.thisFrame = performance.now();
+      this.frameRate = (this.thisFrame - this.lastFrame) * 0.001; //Framerate in seconds
+
+      this.context.fillStyle = "rgba(10,10,10,0.8)";
+      this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+      // Draw a left, right walls and floor
+      this.context.fillStyle = "red";
+      this.context.fillRect(0, 0, this.settings.leftWall, this.canvas.height);
+      this.context.fillRect(this.settings.rightWall, 0, this.canvas.width, this.canvas.height);
+      this.context.fillRect(0, this.settings.groundLevel, this.canvas.width, this.canvas.height);
+      this.context.fillRect(0, 0, this.canvas.width, this.settings.ceilingWall);
+      
+      
+      // Draw the particles
+      if(this.particles.length < this.settings.maxParticles) {
+        for (var i = 0; i < (this.settings.maxParticles - this.particles.length); i++) {
+          this.genParticle();
+          //console.log(this.particles[i]);
+        }
+      }
+
+
+      for (var i in this.particles) {
+        this.updateParticle( i );
+        // Create the shapes
+        //context.fillStyle = "red";
+        //context.fillRect(this.x, this.y, settings.particleSize, settings.particleSize);
+        this.context.clearRect(this.settings.leftWall, this.settings.groundLevel, this.canvas.width, this.canvas.height);
+        this.context.beginPath();
+        this.context.fillStyle="rgb("+String(Math.abs(this.particles[i].vx)*75)+","+String(Math.abs(this.particles[i].vx)*25)+","+String(255 - Math.abs(this.particles[i].vx)*75)+")";
+        // Draws a circle of radius 20 at the coordinates 100,100 on the canvas
+        this.context.arc(this.particles[i].x, this.particles[i].y, this.settings.particleSize, 0, Math.PI*2, true); 
+        this.context.closePath();
+        this.context.fill();
+      }
+
+      setTimeout(() => {this.animationId = requestAnimationFrame(this.draw)},20);
+    }
 }
 
- //Parse Audio file buffers
+//Parse Audio file buffers
 export class BufferLoader { //From HTML5 Rocks tutorial
    constructor(ctx, urlList, callback){
     this.ctx = ctx;
@@ -2654,7 +2654,7 @@ export class SoundJS { //Only one Audio context at a time!
     this.gain = this.ctx.createGain();
     this.analyser = this.ctx.createAnalyser();
     this.out = this.ctx.destination;
-    this.gain.connect(this.analyser)
+    this.gain.connect(this.analyser);
     this.analyser.connect(this.out);
     
   }
@@ -2862,7 +2862,7 @@ export class SoundJS { //Only one Audio context at a time!
   }
 
 }
-
+ 
 export class geolocateJS {
     constructor(){
       if(navigator.geolocation){
