@@ -1,6 +1,6 @@
 import { HEGwebAPI, graphJS, circleJS, audioJS, videoJS, hillJS, textReaderJS, boidsJS, Particles, BufferLoader, SoundJS, geolocateJS, bleUtils  } from './HEGwebAPI'
 import { graphNode, ThreeGlobe } from './threeApp'
-import { nodeSerial } from './nodeserialUtils'
+//import { nodeSerial } from './nodeserialUtils'
 import { ChromaticAberrationEffect } from 'postprocessing';
 // Custom Scripts and UI setup, feedback modules must be manually linked to session event data (you can mix and match or write your own easily) 
 // Advanced Client scripts using external packages
@@ -583,6 +583,7 @@ if((window.location.hostname !== '192.168.4.1')) { //Will not work on an IP
 //---------------------------Serial Additions-----------------------------
 //------------------------------------------------------------------------
 // if (chrome.serial) {}
+/*
 var serialHTML = '<div id="serialContainer" class="serialContainer"><h3>Serial Devices:</h3><div id="serialmenu" class="serialmenu"></div></div>';
 HEGwebAPI.appendFragment(serialHTML,"main_body");
 
@@ -623,7 +624,7 @@ serialMonitor.finalCallback = () => { //Set this so USB devices bind to the inte
 }
 
 makeTooltip("serialContainer",[-220,10],"Click 'Get' to get available Serial devices and 'Set' to pair it with the interface. Right click and press 'Inspect' to see debug output in the Console");
-
+*/
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------

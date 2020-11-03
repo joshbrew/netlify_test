@@ -20,7 +20,6 @@
     "normalize.css": "^8.0.1",
     "postprocessing": "^6.17.4",
     "three": "^0.121.1",
-    "serialport": "^9.0.2",
     "tslib": "^2.0.3"
   },
   "devDependencies": {
