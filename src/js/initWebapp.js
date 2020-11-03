@@ -1,5 +1,7 @@
 import { HEGwebAPI, graphJS, circleJS, audioJS, videoJS, hillJS, textReaderJS, boidsJS, Particles, BufferLoader, SoundJS, geolocateJS, bleUtils  } from './HEGwebAPI'
 import { graphNode, ThreeGlobe } from './threeApp'
+import { nodeSerial } from './nodeserialUtils'
+import { ChromaticAberrationEffect } from 'postprocessing';
 // Custom Scripts and UI setup, feedback modules must be manually linked to session event data (you can mix and match or write your own easily) 
 // Advanced Client scripts using external packages
 
@@ -89,9 +91,20 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
   var modal2 = document.getElementById('modal2');
   var modal3 = document.getElementById('modal3');
   
-  document.getElementById('modal_opener').onclick = function() {toggleModal(modal,'close_modal','overlay')};
-  document.getElementById('modal_opener2').onclick = function() {toggleModal(modal2,'close_modal2','overlay2')};
-  document.getElementById('modal_opener3').onclick = function() {toggleModal(modal3,'close_modal3','overlay3')};
+  document.getElementById('modal_opener').onclick = function() {
+    toggleModal(modal,'close_modal','overlay')
+    this.modal2.style.display = 'none';
+    this.modal3.style.display = 'none';
+  };
+  document.getElementById('modal_opener2').onclick = function() {
+    toggleModal(modal2,'close_modal2','overlay2')
+    this.modal.style.display = 'none';
+    this.modal3.style.display = 'none';
+  };
+  document.getElementById('modal_opener3').onclick = function() {
+    toggleModal(modal3,'close_modal3','overlay3')
+    this.modal.style.display = 'none';
+  };
   
   function toggleHEG(switchElement) {
     if (switchElement.checked) {
@@ -491,86 +504,89 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
 //------------------------------------------------------------------------
 //------------------------Bluetooth LE Additions--------------------------
 //------------------------------------------------------------------------
+if((window.location.hostname !== '192.168.4.1')) { //Will not work on an IP
 
-var ble = new bleUtils(false);
-makeTooltip("blebutton",[-150,40],"Connect to a device via Bluetooth LE!")
+  var ble = new bleUtils(false);
+  makeTooltip("blebutton",[-150,40],"Connect to a device via Bluetooth LE!")
 
-ble.onNotificationCallback = (e) => {
+  ble.onNotificationCallback = (e) => {
 
-  //console.log(e.target.readValue());
-  var line = ble.decoder.decode(e.target.value);
-  if(ble.android == true){
-    line = Date.now()+"|"+line;
+    //console.log(e.target.readValue());
+    var line = ble.decoder.decode(e.target.value);
+    if(ble.android == true){
+      line = Date.now()+"|"+line;
+    }
+    
+    //pass to data handler
+    if(line.split(s.delimiter).length == s.header.length) { //Most likely a data line based on our stream header formatting
+      s.handleEventData(line); 
+      //console.log("Passing BLE Data...", Date.now())
+    }
+    else {
+      console.log("BLE MSG: ", line);
+    }
   }
-  
-  //pass to data handler
-  if(line.split(s.delimiter).length == s.header.length) { //Most likely a data line based on our stream header formatting
-    s.handleEventData(line); 
-    //console.log("Passing BLE Data...", Date.now())
+
+  ble.onReadAsyncCallback = (data) => {
+
+    var line = data;
+    if(ble.android == true){
+      line = Date.now()+"|"+line;
+    }
+
+    //pass to data handler
+    if(line.split(s.delimiter).length == s.header.length) { //Most likely a data line based on our stream header formatting
+      s.handleEventData(line); 
+      //console.log("Passing BLE Data...", Date.now())
+    }
+    else {
+      console.log("BLE MSG: ", line);
+    }
   }
-  else {
-    console.log("BLE MSG: ", line);
+
+  ble.onConnectedCallback = () => {
+    
+    s.removeEventListeners();
+    if(ble.android === true){
+      s.header=["ms","Red","IR","Ratio"];
+      s.updateStreamHeader();
+      s.useMs = true;
+      g.usems = true;
+    }
+    document.getElementById("startbutton").onclick = () => {
+      ble.sendMessage('t');
+    }
+    document.getElementById("stopbutton").onclick = () => {
+      ble.sendMessage('f');
+    }
+    document.getElementById("sendbutton").onclick = () => {
+      ble.sendMessage(document.getElementById('command').value);
+    }
   }
+
+  ble.onDisconnected = () => {
+    if(ble.android == true){
+      s.header=["us","Red","IR","Ratio","Ambient","drdt","ddrdt"]; //try to reset the header in case of reconnecting through a different protocol
+      s.updateStreamHeader();
+      s.useMs = false;
+      g.useMs = false;
+    }
+    console.log("BLE Device disconnected!");
+  }
+
 }
-
-ble.onReadAsyncCallback = (data) => {
-
-  var line = data;
-  if(ble.android == true){
-    line = Date.now()+"|"+line;
-  }
-
-   //pass to data handler
-   if(line.split(s.delimiter).length == s.header.length) { //Most likely a data line based on our stream header formatting
-    s.handleEventData(line); 
-    //console.log("Passing BLE Data...", Date.now())
-  }
-  else {
-    console.log("BLE MSG: ", line);
-  }
-}
-
-ble.onConnectedCallback = () => {
-  
-  s.removeEventListeners();
-  if(ble.android === true){
-    s.header=["ms","Red","IR","Ratio"];
-    s.updateStreamHeader();
-    s.useMs = true;
-    g.usems = true;
-  }
-  document.getElementById("startbutton").onclick = () => {
-    ble.sendMessage('t');
-  }
-  document.getElementById("stopbutton").onclick = () => {
-    ble.sendMessage('f');
-  }
-  document.getElementById("sendbutton").onclick = () => {
-    ble.sendMessage(document.getElementById('command').value);
-  }
-}
-
-ble.onDisconnected = () => {
-  if(ble.android == true){
-    s.header=["us","Red","IR","Ratio","Ambient","drdt","ddrdt"]; //try to reset the header in case of reconnecting through a different protocol
-    s.updateStreamHeader();
-    s.useMs = false;
-    g.useMs = false;
-  }
-  console.log("BLE Device disconnected!");
-}
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 //------------------------------------------------------------------------
-//----------------------Chrome Extension Additions------------------------
+//---------------------------Serial Additions-----------------------------
 //------------------------------------------------------------------------
-/*
+// if (chrome.serial) {}
 var serialHTML = '<div id="serialContainer" class="serialContainer"><h3>Serial Devices:</h3><div id="serialmenu" class="serialmenu"></div></div>';
 HEGwebAPI.appendFragment(serialHTML,"main_body");
 
-var serialMonitor = new chromeSerial();
+var serialMonitor = new nodeSerial(); //new chromeSerial();
 serialMonitor.finalCallback = () => { //Set this so USB devices bind to the interface once connected.
   s.removeEventListeners();
 
@@ -607,7 +623,7 @@ serialMonitor.finalCallback = () => { //Set this so USB devices bind to the inte
 }
 
 makeTooltip("serialContainer",[-220,10],"Click 'Get' to get available Serial devices and 'Set' to pair it with the interface. Right click and press 'Inspect' to see debug output in the Console");
-*/
+
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------

@@ -10,21 +10,21 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
 
     this.ratio=[];
 
-    this.startTime=0;
-    this.slowSMA = 0;
+    this.startTime=    0;
+    this.slowSMA =     0;
     this.slowSMAarr = [0];
-    this.fastSMA = 0;
+    this.fastSMA =     0;
     this.fastSMAarr = [0];
-    this.smaSlope = 0;
-    this.scoreArr = [0];
-    this.replay = false;
+    this.smaSlope =    0;
+    this.scoreArr =   [0];
+    this.replay =   false;
     
-    this.csvDat = [];
-    this.csvIndex = 0;
+    this.csvDat =     [];
+    this.csvIndex =    0;
 
-    this.curIndex = 0;
-    this.noteIndex = [];
-    this.noteText = [];
+    this.curIndex =    0;
+    this.noteIndex =  [];
+    this.noteText =   [];
 
     this.host = host;
     this.source="";
