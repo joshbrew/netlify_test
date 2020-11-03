@@ -1,4 +1,6 @@
-const SerialPort = require('serialport');
+const SerialPort = require('@serialport/stream');
+SerialPort.Binding = require('@serialport/bindings');
+console.log(SerialPort);
 
 //Utils developed by Diego Schmaedech (MIT License). Modified/Generalized by Joshua Brewster (MIT License)
 export class nodeSerial {
@@ -220,7 +222,7 @@ export class nodeSerial {
     }
 
     setupSerial() {
-        this.serialPort.list().then(this.onGetDevices);
+        SerialPort.list().then(this.onGetDevices);
     }
 
     saveCsv(data=this.recorded, name=new Date().toISOString(),delimiter="|",header="Header\n"){

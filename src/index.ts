@@ -8,11 +8,12 @@ import "./js/HEGwebAPI.js"
 import "./js/threeApp.js"
 import "./js/nodeserialUtils.js"
 import "./js/initWebapp.js"
-import { elm } from './util/util';
+//import { elm } from './util/util';
+
 
 main(); // import test
 
-setTimeout(() => elm('title').style = 'opacity: 0;', 2500);
+//setTimeout(() => elm('title').style = 'opacity: 0;', 2500);
 
 if (process.env.NODE_ENV === 'development') {
     console.log('DEV MODE');
