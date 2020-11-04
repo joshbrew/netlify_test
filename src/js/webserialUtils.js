@@ -1,4 +1,4 @@
-//Utils developed by Diego Schmaedech (MIT License). Modified/Generalized by Joshua Brewster (MIT License)
+//Utils developed by Diego Schmaedech (MIT License) for chrome. Modified/Generalized and updated for web Serial by Joshua Brewster (MIT License) 
 export class webSerial {
     constructor(defaultUI=true, parentId='serialmenu', streamMonitorId="serialmonitor") {
         this.displayPorts = [];
@@ -39,30 +39,37 @@ export class webSerial {
     }
 
     setupSelect(parentId, useAsync = true) {
-        var displayOptions = document.createElement('select'); //Element ready to be appended
-        displayOptions.setAttribute('id','serialports')
-        var frag = document.createDocumentFragment();
-        frag.appendChild(displayOptions);
-        document.getElementById(parentId).innerHTML = '<button id="refreshSerial">Get</button><button id="connectSerial">Set</button>';
-        document.getElementById(parentId).appendChild(frag);
-
-        document.getElementById('refreshSerial').onclick = () => {
-            if(useAsync){
-                this.setupSerialAsync();
-            }
-            else {
-                this.setupSerial();
-            }
-        }
-        document.getElementById('connectSerial').onclick = () => {
-            if(useAsync) {
-                this.setupSerialAsync();
-            }
-            else {
-                if(this.connectionId != -1 ) {this.connectSelected(false)}; // Disconnect previous
-                this.connectSelected(true, document.getElementById('serialports').value); 
+        if(chrome.serial){
+            var displayOptions = document.createElement('select'); //Element ready to be appended
+            displayOptions.setAttribute('id','serialports')
+            var frag = document.createDocumentFragment();
+            frag.appendChild(displayOptions);
+            document.getElementById(parentId).innerHTML = '<button id="refreshSerial">Get</button><button id="connectSerial">Set</button>';
+            document.getElementById(parentId).appendChild(frag);
+            document.getElementById('connectSerial').onclick = () => {
+                if(useAsync) {
+                    this.setupSerialAsync();
+                }
+                else {
+                    if(this.connectionId != -1 ) {this.connectSelected(false)}; // Disconnect previous
+                    this.connectSelected(true, document.getElementById('serialports').value); 
+                }
             }
         }
+        else if(navigator.serial){
+            var frag = document.createDocumentFragment();
+            document.getElementById(parentId).innerHTML = '<button id="refreshSerial">Connect</button>';
+            document.getElementById(parentId).appendChild(frag);
+        }
+            document.getElementById('refreshSerial').onclick = () => {
+                if(useAsync){
+                    this.setupSerialAsync();
+                }
+                else {
+                    this.setupSerial();
+                }
+        }
+      
     }
 
     setupMonitor(parentId) {

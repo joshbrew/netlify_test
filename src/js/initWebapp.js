@@ -591,6 +591,14 @@ if((window.location.hostname !== '192.168.4.1')) { //Will not work on an IP
   var serialHTML = '<div id="serialContainer" class="serialContainer"><h3>Serial Devices:</h3><div id="serialmenu" class="serialmenu"></div></div>';
   HEGwebAPI.appendFragment(serialHTML,"main_body");
 
+  if(chrome.serial) {
+    makeTooltip("serialContainer",[-220,10],"Click 'Get' to get available Serial devices and 'Set' to pair with it. Right click and press 'Inspect' to see debug output in the Console");
+  }
+  else if(navigator.serial){
+    makeTooltip("serialContainer",[-220,10],"Click to connect via the browser serial interface");
+  }
+  
+
   var serialMonitor = new webSerial(); //new chromeSerial();
   serialMonitor.finalCallback = () => { //Set this so USB devices bind to the interface once connected.
     s.removeEventListeners();
@@ -626,8 +634,13 @@ if((window.location.hostname !== '192.168.4.1')) { //Will not work on an IP
       }
     }
   }
+}
+else {
+  var serialHTML = '<div id="serialContainer" class="serialContainer">Enable Serial Flag</div>';
+  HEGwebAPI.appendFragment(serialHTML,"main_body");
 
-makeTooltip("serialContainer",[-220,10],"Click 'Get' to get available Serial devices and 'Set' to pair with it. Right click and press 'Inspect' to see debug output in the Console");
+  makeTooltip("serialContainer",[-220,10],"This feature is currently in beta, enable the #experimental-web-platform-features flag it via 'chrome://flags' or other chromium browsers (if supported).");
+  
 }
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
