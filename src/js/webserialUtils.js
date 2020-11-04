@@ -248,7 +248,7 @@ export class webSerial {
     }
 
     async onPortSelected(port) {
-        await port.open({baudrate: 115200 });
+        await port.open({ baudrate: 115200 });
         this.finalCallback();
         this.subscribe(port);
     }
@@ -272,9 +272,8 @@ export class webSerial {
 
     async subscribe(port){
         
-        while (port.readable) {
+        while (this.port.readable) {
             const reader = port.readable.getReader();
-
             try {
                 while (true) {
                 const { value, done } = await reader.read();
@@ -290,14 +289,14 @@ export class webSerial {
                 }
             } catch (error) {
                 console.log(error);// TODO: Handle non-fatal read error.
+                break;
             }
         }
     }
 
     async closePort() {
-        await this.port.reader.cancel();
-        await this.port.writer.close();
         await this.port.close();
+        this.port = null; 
     }
 
 
@@ -309,10 +308,11 @@ export class webSerial {
 
         
         this.port = await navigator.serial.requestPort();
-        navigator.serial.onDisconnected(() => {
+        navigator.serial.addEventListener("disconnect",(e) => {
             this.closePort();
         })
         this.onPortSelected(this.port);
+        
     }
 
     saveCsv(data=this.recorded, name=new Date().toISOString(),delimiter="|",header="Header\n"){
