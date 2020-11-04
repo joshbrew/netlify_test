@@ -635,7 +635,8 @@ if((window.location.hostname !== '192.168.4.1')) { //Will not work on an IP
     }
   }
 }
-else {
+else if (navigator.userAgent.toLowerCase().indexOf("android") < 0) {
+  
   var serialHTML = '<div id="serialContainer" class="serialContainer">Enable Serial Flag</div>';
   HEGwebAPI.appendFragment(serialHTML,"main_body");
 
