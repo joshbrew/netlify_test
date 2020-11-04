@@ -294,6 +294,12 @@ export class webSerial {
         }
     }
 
+    async closePort() {
+        await this.port.reader.cancel();
+        await this.port.writer.close();
+        await this.port.close();
+    }
+
 
     async setupSerialAsync() {
 
@@ -301,7 +307,11 @@ export class webSerial {
             { usbVendorId: 0x10c4, usbProductId: 0x0043 } //CP2102 filter
         ];
 
+        
         this.port = await navigator.serial.requestPort();
+        navigator.serial.onDisconnected(() => {
+            this.closePort();
+        })
         this.onPortSelected(this.port);
     }
 
