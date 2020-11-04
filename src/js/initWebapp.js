@@ -132,12 +132,12 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
   g.createUI("graphBox")
 
   // Feedback
-  var c = new circleJS(); // Default animation initialize
+  var c = null; // Default animation initialize
   var v = null;
   var a = null;
   var h = null;
   var txt = null;
-  var boids = null;
+  var boids = new boidsJS();
 
   var suppressTog = false;
   
