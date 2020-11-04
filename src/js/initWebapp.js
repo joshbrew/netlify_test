@@ -637,7 +637,7 @@ if((window.location.hostname !== '192.168.4.1')) { //Will not work on an IP
 }
 else if (navigator.userAgent.toLowerCase().indexOf("android") < 0) {
   
-  var serialHTML = '<div id="serialContainer" class="serialContainer">Enable Serial Flag</div>';
+  var serialHTML = '<div id="serialContainer" class="serialContainer"><h3>Enable Serial USB support (hover me)<h3></div>';
   HEGwebAPI.appendFragment(serialHTML,"main_body");
 
   makeTooltip("serialContainer",[-220,10],"This feature is currently in beta, enable the #experimental-web-platform-features flag it via 'chrome://flags' or other chromium browsers (if supported).");
