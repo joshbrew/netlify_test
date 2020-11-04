@@ -6,7 +6,7 @@ import { viewSize } from '@giveback007/util-lib/dist/browser'
 import 'regenerator-runtime/runtime'
 import "./js/HEGwebAPI.js"
 import "./js/threeApp.js"
-import "./js/nodeserialUtils.js"
+import "./js/webserialUtils.js"
 import "./js/initWebapp.js"
 //import { elm } from './util/util';
 

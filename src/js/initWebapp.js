@@ -1,6 +1,7 @@
 import { HEGwebAPI, graphJS, circleJS, audioJS, videoJS, hillJS, textReaderJS, boidsJS, Particles, BufferLoader, SoundJS, geolocateJS, bleUtils  } from './HEGwebAPI'
 import { graphNode, ThreeGlobe } from './threeApp'
 //import { nodeSerial } from './nodeserialUtils'
+import { webSerial } from './webserialUtils'
 import { ChromaticAberrationEffect } from 'postprocessing';
 // Custom Scripts and UI setup, feedback modules must be manually linked to session event data (you can mix and match or write your own easily) 
 // Advanced Client scripts using external packages
@@ -114,7 +115,7 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
     }
   }
 
-  document.getElementById("togBtn").onchange = function(){toggleHEG(document.getElementById("togBtn"))};
+  document.getElementById("togBtn").onclick = function(){toggleHEG(document.getElementById("togBtn"))};
 
   document.getElementById("wifibutton").onclick = () => {
     document.getElementById("submithost").click();
@@ -137,6 +138,8 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
   var h = null;
   var txt = null;
   var boids = null;
+
+  var suppressTog = false;
   
   
   var modeHTML = '<div class="menudiv" id="menudiv"> \
@@ -271,8 +274,10 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
   }
   
   s.endOfEvent = function() {
-    if(document.getElementById("togBtn").checked == false){
-      document.getElementById("togBtn").checked = true;
+    if(suppressTog !== true){
+      if(document.getElementById("togBtn").checked == false){
+        document.getElementById("togBtn").checked = true;
+      }
     }
     if(g.xoffsetSlider.max < this.scoreArr.length){
       if(this.scoreArr.length % 20 == 0) { 
@@ -582,17 +587,16 @@ if((window.location.hostname !== '192.168.4.1')) { //Will not work on an IP
 //------------------------------------------------------------------------
 //---------------------------Serial Additions-----------------------------
 //------------------------------------------------------------------------
-if (chrome.serial) {
-
+ if (chrome.serial || navigator.serial) {
   var serialHTML = '<div id="serialContainer" class="serialContainer"><h3>Serial Devices:</h3><div id="serialmenu" class="serialmenu"></div></div>';
   HEGwebAPI.appendFragment(serialHTML,"main_body");
 
-  var serialMonitor = new chromeSerial(); //new chromeSerial();
+  var serialMonitor = new webSerial(); //new chromeSerial();
   serialMonitor.finalCallback = () => { //Set this so USB devices bind to the interface once connected.
-  s.removeEventListeners();
+    s.removeEventListeners();
 
-  document.getElementById("startbutton").onclick = () => {
-    serialMonitor.sendMessage('t');
+    document.getElementById("startbutton").onclick = () => {
+      serialMonitor.sendMessage('t');
     }
     document.getElementById("stopbutton").onclick = () => {
       serialMonitor.sendMessage('f');
@@ -623,7 +627,7 @@ if (chrome.serial) {
     }
   }
 
-  makeTooltip("serialContainer",[-220,10],"Click 'Get' to get available Serial devices and 'Set' to pair it with the interface. Right click and press 'Inspect' to see debug output in the Console");
+makeTooltip("serialContainer",[-220,10],"Click 'Get' to get available Serial devices and 'Set' to pair with it. Right click and press 'Inspect' to see debug output in the Console");
 }
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------

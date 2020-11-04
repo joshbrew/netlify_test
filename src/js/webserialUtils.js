@@ -1,18 +1,17 @@
-const SerialPort = require('serialport');
-console.log(SerialPort);
-
 //Utils developed by Diego Schmaedech (MIT License). Modified/Generalized by Joshua Brewster (MIT License)
-export class nodeSerial {
+export class webSerial {
     constructor(defaultUI=true, parentId='serialmenu', streamMonitorId="serialmonitor") {
         this.displayPorts = [];
         this.defaultUI = defaultUI;
 
-        this.serialPort = null;
         this.encodedBuffer = "";
         this.connectionId = -1;
 
         this.recordData = false;
         this.recorded = [];
+
+        this.port = null;
+        this.decoder = null;
 
         this.monitoring = false;
         this.newSamples = 0;
@@ -20,19 +19,26 @@ export class nodeSerial {
         this.monitorData = [];
         this.monitorIdx = 0;
 
-        if (SerialPort) {
+        if (chrome.serial) {
             if(defaultUI == true) {
-                this.setupSelect(parentId);
+                this.setupSelect(parentId,false);
             }
             this.setupSerial();
+        }
+        else if (navigator.serial) {
+            this.decoder = new TextDecoder();
+            if(defaultUI == true) {
+                this.setupSelect(parentId,true);
+            }
         }  
         else {
-            console.log("ERROR: Cannot locate npm serial port.");
+            console.log("ERROR: Cannot locate navigator.serial. Enable #experimental-web-platform-features in chrome://flags");
+            alert("Serial support not found. Enable #experimental-web-platform-features in chrome://flags or use a chrome extension")
         }
         
     }
 
-    setupSelect(parentId) {
+    setupSelect(parentId, useAsync = true) {
         var displayOptions = document.createElement('select'); //Element ready to be appended
         displayOptions.setAttribute('id','serialports')
         var frag = document.createDocumentFragment();
@@ -41,11 +47,21 @@ export class nodeSerial {
         document.getElementById(parentId).appendChild(frag);
 
         document.getElementById('refreshSerial').onclick = () => {
-            this.setupSerial();
+            if(useAsync){
+                this.setupSerialAsync();
+            }
+            else {
+                this.setupSerial();
+            }
         }
         document.getElementById('connectSerial').onclick = () => {
-            if(this.connectionId != -1 ) {this.connectSelected(false)}; // Disconnect previous
-            this.connectSelected(true, document.getElementById('serialports').value);
+            if(useAsync) {
+                this.setupSerialAsync();
+            }
+            else {
+                if(this.connectionId != -1 ) {this.connectSelected(false)}; // Disconnect previous
+                this.connectSelected(true, document.getElementById('serialports').value); 
+            }
         }
     }
 
@@ -94,7 +110,7 @@ export class nodeSerial {
         requestAnimationFrame(monitorAnim);
     }
 
-    onGetDevices = (ports,err) => {
+    onGetDevices = (ports) => { //leftover from chrome.serial
         document.getElementById('serialports').innerHTML = '';
         var paths = [];
         for (var i = 0; i < ports.length; i++) {
@@ -120,15 +136,17 @@ export class nodeSerial {
 
     onReceive = (receiveInfo) => {
         //console.log("onReceive");
-        //if (receiveInfo.connectionId !== this.connectionId) {
-        //    console.log("ERR: Receive ID:", receiveInfo.connectionId);
-        //    return;
-        //}
+        if (receiveInfo.connectionId !== this.connectionId) {
+            console.log("ERR: Receive ID:", receiveInfo.connectionId);
+            return;
+        }
         var bufView = new Uint8Array(receiveInfo.data);
         var encodedString = String.fromCharCode.apply(null, bufView);
 
         this.encodedBuffer += decodeURIComponent(escape(encodedString));
-        //console.log(this.encodedBuffer.length);
+        console.log(this.encodedBuffer.length);
+        
+
         var index;
         while ((index = this.encodedBuffer.indexOf('\n')) >= 0) {
             var line = this.encodedBuffer.substr(0, index + 1);
@@ -146,37 +164,48 @@ export class nodeSerial {
 
     onReceiveError(errorInfo) {
         console.log("onReceiveError");
-        console.log("Error from ID:", errorInfo.connectionId)
-        this.onError.dispatch(errorInfo.error);
-        console.log("Error: " + errorInfo.error);
-        
+        if (errorInfo.connectionId === this.connectionId) {
+            console.log("Error from ID:", errorInfo.connectionId)
+            this.onError.dispatch(errorInfo.error);
+            console.log("Error: " + errorInfo.error);
+        }
     }
 
     finalCallback() { //Customize this one for the front end integration after the device is successfully connected.
         console.log("USB device Ready!")
     }
 
-    onConnectComplete = () => {
-        this.connectionId = this.serialPort.path;
+    onConnectComplete = (connectionInfo) => {
+        this.connectionId = connectionInfo.connectionId;
         console.log("Connected! ID:", this.connectionId);
 
-        this.serialPort.on('data',this.onReceive);
-        this.serialPort.on('error',this.onReceiveError);
-        this.seriealPort.on('close',this.onDisconnect);
+        chrome.serial.onReceive.addListener(this.onReceive);
+        chrome.serial.onReceiveError.addListener(this.onReceiveError);
 
-        this.finalCallback()
+        this.finalCallback();
     }
 
     sendMessage(msg) {
         msg+="\n";
-        
-        if (this.connectionId > -1) {
-            this.serialPort.write(Buffer.from(msg),this.onSendCallback)
-            console.log("Send message:", msg);
-        } else {
-            console.log("Device is disconnected!");
+        var encodedString = unescape(encodeURIComponent(msg));
+        var bytes = new Uint8Array(encodedString.length);
+        for (var i = 0; i < encodedString.length; ++i) {
+            bytes[i] = encodedString.charCodeAt(i);
         }
-        
+        if (chrome.serial) {
+            if (this.connectionId > -1) {
+                
+                chrome.serial.send(this.connectionId, bytes.buffer, this.onSendCallback);
+                console.log("Send message:", msg);
+            } else {
+                console.log("Device is disconnected!");
+            }
+        }
+        else if (navigator.serial) {
+            if(this.port.writable){
+                this.sendMessageAsync(bytes.buffer);
+            }
+        }
     }
 
     onSendCallback(sendInfo) {
@@ -187,41 +216,93 @@ export class nodeSerial {
         console.log(line);
     }
 
-    connectSelected(connect=true, devicePath='', baud = 115200) { //Set connect to false to disconnect  
+    connectSelected(connect=true, devicePath='') { //Set connect to false to disconnect  
         if ((connect == true) && (devicePath != '')) {
             console.log("Connecting", devicePath);
-            this.serialPort = new SerialPort(devicePath, {baudrate: baud}, this.onConnectComplete);
+            chrome.serial.connect(devicePath, {bitrate: 115200}, this.onConnectComplete);
         } else {
             console.log("Disconnect" + devicePath);
-            if(this.serialPort !== null){
-                this.encodedBuffer = "";
-                
-                //this.serialPort.on('data',this.onReceive);
-                //this.serialPort.on('error',this.onReceiveError);
+            if (this.connectionId < 0) {
+                console.log("connectionId", this.connectionId);
+                return;
+            }
+            this.encodedBuffer = "";
+            chrome.serial.onReceive.removeListener(this.onReceive);
+            chrome.serial.onReceiveError.removeListener(this.onReceiveError);
+            chrome.serial.flush(this.connectionId, function () {
+                console.log("chrome.serial.flush", this.connectionId);
+            });
+            chrome.serial.disconnect(this.connectionId, function () {
+                console.log("chrome.serial.disconnect", this.connectionId);
+            });
+        }
+    }
+    setupSerial() {
+        chrome.serial.getDevices(this.onGetDevices);
+    }
 
-                this.serialPort.flush(function () {
-                    console.log("Flush ", this.connectionId);
-                });
-                this.serialPort.close(function () {
-                    console.log("Serial disconnect", this.connectionId);
-                    this.onDisconnect();
-                });
+    async sendMessageAsync(msg) {
+        const writer = this.port.writable.getWriter();
+        await writer.write(msg);
+        writer.releaseLock();
+    }
+
+    async onPortSelected(port) {
+        await port.open({baudrate: 115200 });
+        this.finalCallback();
+        this.subscribe(port);
+    }
+
+    onReceiveAsync(value){
+        this.encodedBuffer += this.decoder.decode(value);
+        var index;
+        while ((index = this.encodedBuffer.indexOf('\n')) >= 0) {
+            var line = this.encodedBuffer.substr(0, index + 1);
+            if(this.recordData == true) {
+                this.recorded.push(line);
+            }
+            if(this.monitoring = true){
+                this.newSamples++;
+                this.monitorData.push(line);
+            }
+            this.onReadLine(line);
+            this.encodedBuffer = this.encodedBuffer.substr(index + 1);
+        }
+    }
+
+    async subscribe(port){
+        
+        while (port.readable) {
+            const reader = port.readable.getReader();
+
+            try {
+                while (true) {
+                const { value, done } = await reader.read();
+                if (done) {
+                    // Allow the serial port to be closed later.
+                    reader.releaseLock();
+                    break;
+                }
+                if (value) {
+                    this.onReceiveAsync(value);
+                    //console.log(this.decoder.decode(value));
+                }
+                }
+            } catch (error) {
+                console.log(error);// TODO: Handle non-fatal read error.
             }
         }
     }
 
-    disconnect() {
-        this.serialPort.close(this.onDisconnect());
-    }
 
-    onDisconnect() {
-        this.connectionId = -1;
-        this.serialPort = null;
-        console.log("Disconnected from serial device");
-    }
+    async setupSerialAsync() {
 
-    setupSerial() {
-        SerialPort.list().then(this.onGetDevices);
+        const filters = [
+            { usbVendorId: 0x10c4, usbProductId: 0x0043 } //CP2102 filter
+        ];
+
+        this.port = await navigator.serial.requestPort();
+        this.onPortSelected(this.port);
     }
 
     saveCsv(data=this.recorded, name=new Date().toISOString(),delimiter="|",header="Header\n"){
