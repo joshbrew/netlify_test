@@ -40,7 +40,7 @@ class chromeSerial {
             this.setupSerial();
         }
         document.getElementById('connectSerial').onclick = () => {
-            if(this.connectionId != -1 ) {this.connectSelected(false)}; // Disconnect previous
+            if(this.connectionId !== -1 ) {this.connectSelected(false)}; // Disconnect previous
             this.connectSelected(true, document.getElementById('serialports').value);
         }
     }
@@ -189,7 +189,7 @@ class chromeSerial {
     }
 
     connectSelected(connect=true, devicePath='') { //Set connect to false to disconnect  
-        if ((connect == true) && (devicePath != '')) {
+        if ((connect == true) && (devicePath !== '')) {
             console.log("Connecting", devicePath);
             chrome.serial.connect(devicePath, {bitrate: 115200}, this.onConnectComplete);
         } else {
@@ -223,7 +223,7 @@ class chromeSerial {
         var hiddenElement = document.createElement('a');
         hiddenElement.href = "data:text/csv;charset=utf-8," + encodeURI(csvDat);
         hiddenElement.target = "_blank";
-        if(name != ""){
+        if(name !== ""){
             hiddenElement.download = name+".csv";
         }
         else{

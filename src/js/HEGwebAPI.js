@@ -139,21 +139,23 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
 
   }
 
-  //Input data and averaging window, output array of moving averages (should be same size as input array, initial values not fully averaged due to window)
+  // Input data and averaging window, output array of moving averages (should be same size as input array, initial values not fully averaged due to window)
   static sma(arr, window) {
-    var temp = []; //console.log(arr);
-    for(var i = 0; i < arr.length; i++) {
+    arr = arr.slice(-1 * window);
+    const temp = [];
+    
+    for (let i = 0; i < arr.length; i++) {
       if (i === 0) {
         temp.push(arr[0]);
-      } else if (i < window) { //average partial window (prevents delays on screen)
-        var arrslice = arr.slice(0,i+1);
-        temp.push(arrslice.reduce((previous,current) => current += previous ) / (i+1));
-      } else { //average windows
-        var arrslice = arr.slice(i-window,i);
-        temp.push(arrslice.reduce((previous,current) => current += previous) / window);
+      } else if (i < window) { // average partial window (prevents delays on screen)
+        const arrSlice = arr.slice(0, i + 1);
+        temp.push(arrSlice.reduce((previous, current) => current += previous) / (i + 1));
+      } else { // average windows
+        const arrSlice = arr.slice(i - window, i);
+        temp.push(arrSlice.reduce((previous, current) => current += previous) / window);
       }
-    } 
-    //console.log(temp);
+    }
+
     return temp;
   }
 
@@ -164,7 +166,6 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
     this.slowSMA = this.slowSMAarr[this.slowSMAarr.length - 1];
 
     this.smaSlope = this.fastSMA - this.slowSMA;
-    //this.scoreArr.push(this.scoreArr[this.scoreArr.length-1]+this.smaSlope);
   }
 
   //Converts arrays of strings representing lines of data into CSVs
@@ -727,6 +728,7 @@ export class graphJS {
     
   makePoints(numPoints, yArr) {
     const highestPointNdx = numPoints - 1;
+
     return Array.from({length: numPoints * 2}, (_, i) => {
       const pointId = i * 0.5 | 0;
       const lerp0To1 = pointId / highestPointNdx;
@@ -810,7 +812,6 @@ export class graphJS {
   }
 
   normalize = (val, max = 255, min = 0) => (val - min) / (max - min);
-  
 
   draw = () => {
 

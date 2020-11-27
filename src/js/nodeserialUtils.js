@@ -44,7 +44,7 @@ export class nodeSerial {
             this.setupSerial();
         }
         document.getElementById('connectSerial').onclick = () => {
-            if(this.connectionId != -1 ) {this.connectSelected(false)}; // Disconnect previous
+            if(this.connectionId !== -1 ) {this.connectSelected(false)}; // Disconnect previous
             this.connectSelected(true, document.getElementById('serialports').value);
         }
     }
@@ -188,7 +188,7 @@ export class nodeSerial {
     }
 
     connectSelected(connect=true, devicePath='', baud = 115200) { //Set connect to false to disconnect  
-        if ((connect == true) && (devicePath != '')) {
+        if ((connect == true) && (devicePath !== '')) {
             console.log("Connecting", devicePath);
             this.serialPort = new SerialPort(devicePath, {baudrate: baud}, this.onConnectComplete);
         } else {
@@ -233,7 +233,7 @@ export class nodeSerial {
         var hiddenElement = document.createElement('a');
         hiddenElement.href = "data:text/csv;charset=utf-8," + encodeURI(csvDat);
         hiddenElement.target = "_blank";
-        if(name != ""){
+        if(name !== ""){
             hiddenElement.download = name+".csv";
         }
         else{

@@ -127,7 +127,7 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
   // ------------------------------------------------------------------------
  
   // Initialize Graph
-  var g = new graphJS(1155,[255,100,80,1],1.0,[1400,600], "main_body", "g", false); // This could be swapped for a superior graphing package
+  const g = new graphJS(1155, [255,100,80,1], 1.0, [1400,600], "main_body", "g", false); // This could be swapped for a superior graphing package
   
   s.createUI("dataBox");
   g.createUI("graphBox")
@@ -228,33 +228,38 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
   // Customize session functions
   s.handleScore = function() {
     g.clock = this.clock[this.clock.length - 1] - this.startTime;
-    if(this.ratio.length > 40){
-      if(g.sampleRate === null) {
-        if(s.useMs === true){ g.sampleRate = (this.clock[this.clock.length - 1] - this.clock[0]) * 0.001 / this.clock.length; } // Seconds / Sample
-        else{ g.sampleRate = (this.clock[this.clock.length - 1] - this.clock[0]) * 0.000001 / this.clock.length; } // Seconds / Sample
+    if (this.ratio.length > 40) {
+
+      if (g.sampleRate === null) {
+        if (s.useMs === true)
+          g.sampleRate = (this.clock[this.clock.length - 1] - this.clock[0]) * 0.001 / this.clock.length;// Seconds / Sample
+        else
+          g.sampleRate = (this.clock[this.clock.length - 1] - this.clock[0]) * 0.000001 / this.clock.length; // Seconds / Sample
       }
+
       this.smaScore(this.ratio);
-      var score = this.smaSlope*this.sensitivity.value*0.01;
-      if(c != null){
+      const score = this.smaSlope * this.sensitivity.value * 0.01;
+
+      if (c !== null){
         c.onData(score);
       }
-      if (v != null) {
+      if (v !== null) {
         v.onData(score);
       }
-      if(a != null) {
+      if (a !== null) {
         a.onData(score);
       }
-      if(h != null) {
+      if (h !== null) {
         h.onData(score);
       }
-      if(txt != null) {
+      if (txt !== null) {
         txt.onData(score);
       }
-      if(boids != null) {
+      if (boids !== null) {
         boids.onData(score);
       }
-      if(useAdvanced) { // Score handling for advanced scripts
-        if(threeApp != null) {
+      if (useAdvanced) { // Score handling for advanced scripts
+        if(threeApp !== null) {
           threeApp.onData(score);
         }
       }
@@ -334,32 +339,32 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
     s.resetVars();
     g.resetVars();
   
-    if(c != null) {
+    if(c !== null) {
       deInitMode();
       c = new circleJS();
     }
-    if(v != null) {
+    if(v !== null) {
       deInitMode();
       v = new videoJS();
     }
-    if(a != null) {
+    if(a !== null) {
       deInitMode();
       a = new audioJS();
     }
-    if(h != null) {
+    if(h !== null) {
       deInitMode();
       h = new hillJS();
     }
-    if(txt != null) {
+    if(txt !== null) {
       deInitMode();
       txt = new textReaderJS();
     }
-    if(boids != null){
+    if(boids !== null){
       deInitMode();
       boids = new boidsJS();
     }
     if(useAdvanced){
-      if(threeApp != null) {
+      if(threeApp !== null) {
         deInitMode();
         threeApp = new ThreeGlobe();
       }

@@ -388,7 +388,7 @@ export class ThreeGlobe {
     }
 
     render = () => {
-        if(this.threeWidth != window.innerWidth - 20) {
+        if(this.threeWidth !== window.innerWidth - 20) {
             this.threeWidth = window.innerWidth - 20;
             this.renderer.setPixelRatio(window.devicePixelRatio);
             this.renderer.setSize(this.threeWidth, 435);
