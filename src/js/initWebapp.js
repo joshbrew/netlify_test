@@ -274,59 +274,58 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
     }
   }
   
-  s.endOfEvent = () => {
+  s.endOfEvent = function() {
     if (suppressTog !== true && elm("togBtn").checked === false) {
         elm("togBtn").checked = true;
     }
+
     if (g.xoffsetSlider.max < this.scoreArr.length) {
-      if(this.scoreArr.length % 20 === 0) {
+      
+      if(this.scoreArr.length % 20 === 0)
         g.xoffsetSlider.max = this.scoreArr.length - 3; // Need 2 vertices minimum
-      }
     }
   }
   
-  function deInitMode(){
-    if(v != null){
+  function deInitMode() {
+    if (v !== null) {
       HEGwebAPI.removeParent(v.vidapiId);  
       HEGwebAPI.removeParent(v.vidContainerId);
       v.deInit();
       v = null;
     }
-    if(a != null){
+    if (a !== null) {
       a.stopAudio();
       a.endAudio(a);
       HEGwebAPI.removeParent(a.audioId);
       HEGwebAPI.removeParent(a.audmenuId);
       a = null;
     }
-    if(c != null){
+    if (c !== null) {
       c.deInit();
       HEGwebAPI.removeParentParent(c.canvasId);
       HEGwebAPI.removeParent(c.canvasmenuId);
       c = null;
     }
-    if(h != null){
+    if (h !== null) {
       h.deInit();
       HEGwebAPI.removeParentParent(h.canvasId);
       HEGwebAPI.removeParent(h.canvasmenuId)
       h = null;
     }
-    if(txt != null){
+    if (txt !== null) {
       txt.deInit();
       HEGwebAPI.removeParentParent(txt.canvasId);
       HEGwebAPI.removeParent(txt.canvasmenuId);
       txt = null;
     }
-    if(boids != null){
+    if (boids !== null) {
       boids.deInit();
       HEGwebAPI.removeParentParent(boids.canvasId);
       boids = null;
     }
-    if(useAdvanced) { // Score handling for advanced scripts
-      if(threeApp != null) {
+    if (useAdvanced && threeApp !== null) { // Score handling for advanced scripts
         threeApp.destroyThreeApp();
         threeApp = null;
-      }
     }
   }
   
@@ -508,7 +507,7 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
 //------------------------------------------------------------------------
 if (window.location.hostname !== '192.168.4.1') { // Will not work on an IP
 
-  const ble_ = new HegConnection((ev) => {
+  const ble = new HegConnection((ev) => {
     const dataView = ev.target.value;
     const rawVal = decoder.decode(dataView);
     
