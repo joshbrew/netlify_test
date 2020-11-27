@@ -44,7 +44,7 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
     
     this.defaultUI = defaultUI;
     this.ui = false;
-    if (defaultUI==true) {
+    if (defaultUI === true) {
       this.parentId = parentId;
       this.createUI(parentId,header);
     }
@@ -143,14 +143,12 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
   static sma(arr, window) {
     var temp = []; //console.log(arr);
     for(var i = 0; i < arr.length; i++) {
-      if((i == 0)) {
+      if (i === 0) {
         temp.push(arr[0]);
-      }
-      else if(i < window) { //average partial window (prevents delays on screen)
+      } else if (i < window) { //average partial window (prevents delays on screen)
         var arrslice = arr.slice(0,i+1);
         temp.push(arrslice.reduce((previous,current) => current += previous ) / (i+1));
-      }
-      else { //average windows
+      } else { //average windows
         var arrslice = arr.slice(i-window,i);
         temp.push(arrslice.reduce((previous,current) => current += previous) / window);
       }
@@ -174,8 +172,8 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
     var csvDat = header+"\n";
     data.forEach((line, i) => {
       csvDat += line.split(delimiter).join(",");
-      if(saveNotes == true){
-        if(this.noteIndex.indexOf(i) !== -1) {csvDat+=","+[this.noteText[this.noteIndex.indexOf(i)]]}
+      if (saveNotes === true) {
+        if (this.noteIndex.indexOf(i) !== -1) {csvDat+=","+[this.noteText[this.noteIndex.indexOf(i)]]}
       }
       if(line.indexOf('\n') < 0) {csvDat+="\n";}
     });
@@ -183,16 +181,15 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
     var hiddenElement = document.createElement('a');
     hiddenElement.href = "data:text/csv;charset=utf-8," + encodeURI(csvDat);
     hiddenElement.target = "_blank";
-    if(name !== ""){
+    if (name !== "") {
         hiddenElement.download = name+".csv";
-    }
-    else{
+    } else{
         hiddenElement.download = Date().toISOString()+".csv";
     }
     hiddenElement.click();
   }
 
-  openFile(delimiter=",") {
+  openFile(delimiter = ",") {
     var input = document.createElement('input');
     input.type = 'file';
 
@@ -225,28 +222,35 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
 
   replayCSV() {
     if(this.csvIndex < 2){
-      if(this.startTime == 0) { this.startTime = this.csvDat[this.csvIndex][0]}
+      if (this.startTime === 0) {
+        this.startTime = this.csvDat[this.csvIndex][0];
+      }
+
       this.clock.push(parseInt(this.csvDat[this.csvIndex][0]));
       this.ratio.push(parseFloat(this.csvDat[this.csvIndex][3]));
     }
     this.csvIndex++;
     if(this.csvIndex < this.csvDat.length - 1){
-      if(this.startTime == 0) { this.startTime = this.csvDat[this.csvIndex][0]}
+      if (this.startTime === 0)
+        this.startTime = this.csvDat[this.csvIndex][0]
+
       this.clock.push(parseInt(this.csvDat[this.csvIndex][0]));
       this.ratio.push(parseFloat(this.csvDat[this.csvIndex][3]));
-      if(this.clock.length >= 2){
+      
+      if (this.clock.length >= 2) {
         this.handleScore();
         this.updateStreamRow(this.csvDat[this.csvIndex]);
       }
-    }
-    else {
+    } else {
       this.replay = false;
       this.csvDat = [];
       this.csvIndex = 0;
     }
-    //this.endOfEvent();
-    if(this.useMs == true){ setTimeout(() => {this.replayCSV();},(this.clock[this.csvIndex]-this.clock[this.csvIndex-1])); } //Call until end of index.
-    else{ setTimeout(() => {this.replayCSV();},(this.clock[this.csvIndex]-this.clock[this.csvIndex-1])*0.001); } //Call until end of index.
+    
+    if (this.useMs === true)
+      setTimeout(() => this.replayCSV(), (this.clock[this.csvIndex]-this.clock[this.csvIndex-1]));
+    else
+      setTimeout(() => this.replayCSV(), (this.clock[this.csvIndex]-this.clock[this.csvIndex-1]) * 0.001);
   }
   
   openCSV() {
@@ -281,48 +285,47 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
 
   handleEventData(data, delimiter="|", uIdx=0, rIdx=3) { // Can set custom delimiters, time counters (us) index, and ratio index of incoming data.
     // console.log("handleEventData", data);
-    if(this.raw[this.raw.length - 1] !== data){  //on new output
-      if(this.ui == true){
-        elm("heg").innerHTML = data;
-      }
+    if (this.raw[this.raw.length - 1] !== data) { // on new output
+      if (this.ui === true) elm("heg").innerHTML = data;
+
       //Create event for posting data from an iframe implementation of this code.
-      var onRead = new CustomEvent('on_read', { detail: {data: data} }); 
+      const onRead = new CustomEvent('on_read', { detail: {data: data} });
       window.parent.dispatchEvent(onRead); 
       window.parent.postMessage(data, "*");
 
-      if(data.includes(delimiter)) { //Checks that it's a data line of specified format
+      if (data.includes(delimiter)) { // Checks that it's a data line of specified format
         this.raw.push(data);
         var dataArray = data.split(delimiter);
         var thisRatio = parseFloat(dataArray[rIdx]);
-        if(thisRatio > 0) { 
-          if(this.startTime == 0) { this.startTime = parseInt(dataArray[0]); }
+        if (thisRatio > 0) {
+          if (this.startTime === 0) this.startTime = parseInt(dataArray[0]);
+
           this.clock.push(parseInt(dataArray[uIdx]));
           this.ratio.push(parseFloat(dataArray[rIdx]));
 
-          if(this.clock.length > 5) { // SMA filtering for ratio
+          if (this.clock.length > 5) { // SMA filtering for ratio
             var temp = HEGwebAPI.sma(this.ratio.slice(this.ratio.length - 5, this.ratio.length), 5); 
             //console.log(temp);
-            if((this.ratio[this.ratio.length - 1] < temp[4] * 0.7) || (this.ratio[this.ratio.length - 1] > temp[4] * 1.3)) {
+            if ((this.ratio[this.ratio.length - 1] < temp[4] * 0.7) || (this.ratio[this.ratio.length - 1] > temp[4] * 1.3)) {
               this.ratio[this.ratio.length - 1] = this.ratio[this.ratio.length - 2]; // Roll the ratio back if outside margin 
               dataArray[rIdx] = temp;
             } 
             this.filtered.push(dataArray.join(delimiter));
           }
+
           //handle new data
           this.handleScore();
-          if(this.defaultUI == true){
-            this.updateStreamRow(dataArray);
-          }
+          if (this.defaultUI === true) this.updateStreamRow(dataArray);
+
         } 
       }
-    }
-    //handle if data not changed
-    else if (this.replay == false) {
+    } else if (this.replay === false) { //handle if data not changed
       //s.smaSlope = s.scoreArr[s.scoreArr.length - 1];
       //g.graphY1.shift();
       //g.graphY1.push(s.scoreArr[s.scoreArr.length - 1 - g.xoffset]);
       //s.scoreArr.push(s.smaSlope);
     }
+
     this.endOfEvent();
   }
 
@@ -440,8 +443,11 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
     
     elm("getTime").onclick = () => {
       this.curIndex = this.clock.length - 1;
-      if(this.useMs == true) { elm("timestamp").innerHTML = (this.clock[this.clock.length - 1] * 0.001).toFixed(2) + "s"; }
-      else { elm("timestamp").innerHTML = (this.clock[this.clock.length - 1] * 0.000001).toFixed(2) + "s"; }
+
+      if (this.useMs === true)
+        elm("timestamp").innerHTML = (this.clock[this.clock.length - 1] * 0.001).toFixed(2) + "s";
+      else
+        elm("timestamp").innerHTML = (this.clock[this.clock.length - 1] * 0.000001).toFixed(2) + "s";
     }
 
     elm("saveNote").onclick = () => {
@@ -452,16 +458,17 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
       elm("timestamp").innerHTML = "Get Current Time";
     }
 
-    elm("savecsv").onclick = () => {this.saveCSV();}
-    elm("replaycsv").onclick = () => {this.openCSV();}
-
-    elm("resetSession").onclick = () => {this.resetVars();}
+    elm("savecsv").onclick = () => this.saveCSV();
+    elm("replaycsv").onclick = () => this.openCSV();
+    elm("resetSession").onclick = () => this.resetVars();
 
     this.sensitivity = elm("sensitivity");
+
     elm("reset_s").onclick = () => { 
       this.sensitivity.value = 100; 
       elm("sensitivityVal").innerHTML = (this.sensitivity.value * 0.01).toFixed(2);
     }
+
     elm("sensitivity").oninput = () => {
       elm("sensitivityVal").innerHTML = (this.sensitivity.value * 0.01).toFixed(2);
     }
@@ -481,6 +488,7 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
       xhr.onerror = function() { xhr.abort(); }
       //xhr.abort();
     }
+
     elm("sendbutton").onclick = () => {
       var data = new FormData();
       data.append('command', elm('command').value);
@@ -492,15 +500,12 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
     }
 
     elm("submithost").onclick = () => {
-      if(window.EventSource){ 
+      if (window.EventSource)
         this.removeEventListeners();
-      }
-      if(elm("hostname").value.length > 2) {
+      if (elm("hostname").value.length > 2)
         this.host = elm("hostname").value;
-      }
-      else{
+      else
         this.host = "http://192.168.4.1";
-      }
 
       elm("startbutton").onclick = () => {
         var xhr = new XMLHttpRequest();
@@ -572,28 +577,28 @@ export class graphJS {
     this.yoffset = 0;
 
     this.xAxis = new Float32Array([
-    -1.0,0.0,
-    1.0,0.0
+      -1.0,0.0,
+      1.0,0.0
     ]);
 
     this.yAxis = new Float32Array([
-    -0.765,-1.0,
-    -0.765,1.0
+      -0.765,-1.0,
+      -0.765,1.0
     ]);
 
     this.xgradient = new Float32Array([
-    -1.0,-0.75,
-    1.0,-0.75,
-    -1.0,-0.5,
-    1.0,-0.5,
-    -1.0,-0.25,
-    1.0,-0.25,
-    -1.0,0.25,
-    1.0,0.25,
-    -1.0,0.5,
-    1.0,0.5,
-    -1.0,0.75,
-    1.0,0.75
+      -1.0,-0.75,
+      1.0,-0.75,
+      -1.0,-0.5,
+      1.0,-0.5,
+      -1.0,-0.25,
+      1.0,-0.25,
+      -1.0,0.25,
+      1.0,0.25,
+      -1.0,0.5,
+      1.0,0.5,
+      -1.0,0.75,
+      1.0,0.75
     ]);
 
     this.ygradient = new Float32Array([
@@ -625,7 +630,7 @@ export class graphJS {
     HEGwebAPI.appendFragment(shaderHTML,parentId);
 
     this.defaultUI = defaultUI;
-    if(defaultUI == true){
+    if(defaultUI === true){
       this.createUI(parentId);
     }
     this.initGL(canvasId);
@@ -646,14 +651,14 @@ export class graphJS {
     this.viewing = 0;
     this.VERTEX_LENGTH = this.nPoints;
 
-    this.graphY1 = [...Array(this.VERTEX_LENGTH).fill(0)];
-    this.graphY2 = [...Array(this.VERTEX_LENGTH).fill(0)];
+    this.graphY1 = [ ...this.VERTEX_LENGTH.fill(0) ];
+    this.graphY2 = [ ...this.VERTEX_LENGTH.fill(0) ];
 
     this.xoffset = 0; //Index offset
     this.yoffset = 0;
   }
 
-  createUI(parentId){
+  createUI(parentId) {
     var graphOptions = '<div class="scale"> \
       <table id="graphSliderTable"> \
       <tr><td id="xoffsettd">X Offset:<br><input type="range" class="slider" id="xoffset" min=0 max=1000 value=0></td><td><button id="xoffsetbutton" class="button">Reset</button></td></tr> \
@@ -691,9 +696,9 @@ export class graphJS {
       this.invScale = 1;
     }
 
-    elm("autoscale").onclick = () => {
+    elm("autoscale").onclick = () =>
       this.autoscale = elm("autoscale").checked;
-    }
+
     var radios = document.graphform.graphview;
     for (var i = 0; i < radios.length; i++) {
       radios[i].addEventListener('change', () => {
@@ -726,7 +731,7 @@ export class graphJS {
       const pointId = i * 0.5 | 0;
       const lerp0To1 = pointId / highestPointNdx;
       const isY = i % 2;
-      if(this.autoscale == true){
+      if(this.autoscale === true){
         if(yArr[i] > this.invScale){
           this.invScale = yArr[i];
           this.yscale = 1/this.invScale;
@@ -744,7 +749,7 @@ export class graphJS {
     });
   }
 
-  createVertices(vArr,color=this.color) {
+  createVertices(vArr, color = this.color) {
     const buffer = this.gl.createBuffer();
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
     this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(vArr), this.gl.DYNAMIC_DRAW);
@@ -788,15 +793,15 @@ export class graphJS {
       console.log("new array too small, needs 10 points minimum");
     }
     else {
-      if(this.VERTEX_LENGTH > newArr.length){
+      if (this.VERTEX_LENGTH > newArr.length) {
         this.VERTEX_LENGTH = newArr.length;
       }
-      if(this.viewing == 0){
+      if (this.viewing === 0) {
         for(var i = 1; i <= this.VERTEX_LENGTH; i++) {
           this.graphY1[i] = newArr[newArr.length - 1 - (this.VERTEX_LENGTH - i)];
         }
       }
-      if(this.viewing == 1){
+      if (this.viewing === 1) {
         for(var i = 1; i <= this.VERTEX_LENGTH; i++) {
           this.graphY2[i] = newArr[newArr.length - 1 - (this.VERTEX_LENGTH - i)];
         }
@@ -829,10 +834,10 @@ export class graphJS {
     this.gl.drawArrays(this.gl.LINES, 0, 6);
     
     //Data line
-    if (this.viewing == 0)
+    if (this.viewing === 0)
       this.vertices = this.makePoints(this.VERTEX_LENGTH, this.graphY1);
 
-    if (this.viewing == 1)
+    if (this.viewing === 1)
       this.vertices = this.makePoints(this.VERTEX_LENGTH, this.graphY2);
 
     this.createVertices(this.vertices);
@@ -864,7 +869,6 @@ export class graphJS {
     seconds = seconds - minutes * 60;
     if(seconds < 10) seconds = "0" + seconds;
 
-
     if (this.viewing === 0) {
       this.graphtext.fillStyle = "#00ff00";
       this.graphtext.fillText("  Time: " + minutes + ":" + seconds, cvWidth - 300,50);
@@ -872,7 +876,8 @@ export class graphJS {
       this.graphtext.fillStyle = "#99ffbb";
       this.graphtext.fillText("    Score: " + this.graphY1[this.graphY1.length - 1].toFixed(2), cvWidth - 720,50);
     }
-    if (this.viewing == 1) {
+
+    if (this.viewing === 1) {
       this.graphtext.fillStyle = "#00ff00";
       this.graphtext.fillText("  Time: " + minutes + ":" + seconds, cvWidth - 300,50);
       this.graphtext.fillText("    Score: " + this.graphY1[this.graphY1.length - 1].toFixed(2) + "  ", cvWidth - 720,50);
@@ -895,9 +900,8 @@ export class graphJS {
       this.graphtext.fillText((Math.ceil(this.sampleRate * this.VERTEX_LENGTH * 0.25)).toFixed(0)+"s", cvWidth * 0.751, cvHeight * 0.85);
       this.graphtext.fillText((Math.ceil(this.sampleRate * this.VERTEX_LENGTH * 0.75)).toFixed(0)+"s", cvWidth * 0.251, cvHeight * 0.85);
     }
-    //console.log("Graph updated", Date.now());
-    setTimeout(()=>{this.animationId = requestAnimationFrame(this.draw);},40); 
     
+    setTimeout(()=> this.animationId = requestAnimationFrame(this.draw), 40);
   }
   
 }
@@ -915,7 +919,7 @@ export class circleJS {
     
     this.defaultUI = defaultUI;
     this.hidden = false;
-    if(defaultUI == true){  this.createUI(parentId);  }
+    if(defaultUI === true){  this.createUI(parentId);  }
  
     this.c.width = res[0];
     this.c.height = res[1];
@@ -950,14 +954,14 @@ export class circleJS {
     elm("circleAudiobutton").style.opacity = 0.3;
 
     elm("circleAudiobutton").onclick = () => {
-      if(this.soundFX == null) { 
+      if(this.soundFX === null) { 
         this.soundFX = new SoundJS(); 
         this.soundFX.gain.gain.value = 0.1;
         this.soundFX.playFreq([300]);
         elm("circleAudiobutton").style.opacity = 1.0;
       }
       else{
-        if(this.soundFX.gain.gain.value == 0) {
+        if(this.soundFX.gain.gain.value === 0) {
           this.soundFX.gain.gain.value = 0.1;
           elm("circleAudiobutton").style.opacity = 1.0;
         }
@@ -969,7 +973,7 @@ export class circleJS {
     }
 
     elm("showhide").onclick = () => {
-      if(this.hidden == false){
+      if(this.hidden === false){
         elm(canvasmenuId).style.display = 'none';
         elm("showhide").innerHTML = "Show UI";
         this.hidden = true;
@@ -1076,7 +1080,7 @@ export class videoJS {
         this.defaultUI = defaultUI;
         this.sliderfocus = false;
         this.hidden = false;
-        if(defaultUI == true){
+        if(defaultUI === true){
           this.addUI(parentId);
         }
         this.init(defaultUI);
@@ -1098,8 +1102,8 @@ export class videoJS {
         elm("stopbutton").addEventListener('click', this.stopVideo, false);
         
         elm("play").onclick = () => {
-          if(this.vidQuery.playbackRate == 0){
-            if(this.useRate == true){
+          if(this.vidQuery.playbackRate === 0){
+            if(this.useRate === true){
               this.vidQuery.playbackRate = this.playRate;
             }
             else {
@@ -1115,7 +1119,7 @@ export class videoJS {
         }
         
         elm("useAlpha").onclick = () => {
-         if(this.useAlpha == true){
+         if(this.useAlpha === true){
            this.useAlpha = false;
            this.alpha = 0;
            elm("useAlpha").style.opacity = "0.3";
@@ -1124,7 +1128,7 @@ export class videoJS {
         }
 
         elm("useRate").onclick = () => {
-         if(this.useRate == true){
+         if(this.useRate === true){
            this.useRate = false;
            this.playRate = 1;
            this.vidQuery.playbackRate = 1;
@@ -1141,7 +1145,7 @@ export class videoJS {
         }
 
         elm("useVol").onclick = () => {
-         if(this.useVol == true){
+         if(this.useVol === true){
            this.vidQuery.muted = true;
            this.useVol = false;
            this.volume = 0;
@@ -1158,7 +1162,7 @@ export class videoJS {
         }
 
         elm("useTime").onclick = () => {
-          if(this.useTime == true){
+          if(this.useTime === true){
             this.useTime = false;
             this.playRate = 1;
             this.vidQuery.playbackRate = 1;
@@ -1208,7 +1212,7 @@ export class videoJS {
         }
 
         elm("showhide").onclick = () => {
-          if(this.hidden == false) {
+          if(this.hidden === false) {
             this.hidden = true;
             elm("showhide").innerHTML = "Show UI";
             elm("vidbuttons").style.display = "none";
@@ -1280,7 +1284,7 @@ export class videoJS {
     }
 
     onData(score){
-      if(this.useAlpha == true) {
+      if(this.useAlpha === true) {
         if(((this.alpha < 0.8) || (score > 0)) && ((this.alpha > 0)||(score < 0))){
           if(this.alpha - score < 0){
             this.alpha = 0;
@@ -1293,7 +1297,7 @@ export class videoJS {
           }
         }
       }
-      if(this.useRate == true){
+      if(this.useRate === true){
         if(((this.vidQuery.playbackRate < 3) || (score < 0)) && ((this.vidQuery.playbackRate > 0) || (score > 0)))
         { 
           this.playRate = this.vidQuery.playbackRate + score*0.5;
@@ -1311,7 +1315,7 @@ export class videoJS {
           }
         }
       }
-      if(this.useVol == true){
+      if(this.useVol === true){
         if(((this.vidQuery.volume < 1) || (score < 0)) && ((this.vidQuery.volume > 0) || (score > 0)))
         {
           this.volume = this.vidQuery.volume + score*0.5;
@@ -1326,13 +1330,13 @@ export class videoJS {
           }
         }
       }
-      if(this.useTime == true){
+      if(this.useTime === true){
         this.vidQuery.currentTime += score*10;
       }
     }
     
     animateRect = () => {
-      if((this.defaultUI == true) && (this.sliderfocus == false)) {
+      if((this.defaultUI === true) && (this.sliderfocus === false)) {
         this.timeSlider.value = Math.floor(1000 * this.vidQuery.currentTime / this.vidQuery.duration);
       }
         this.gl.clearColor(0,0,0.1,this.alpha);
@@ -1342,7 +1346,7 @@ export class videoJS {
 
     init(defaultUI) {
        this.vidQuery = elm(this.vidContainerId+'vid');
-       if(this.useVol == true){
+       if(this.useVol === true){
         this.vidQuery.muted = false;
         this.vidQuery.volume = 0.5;
         this.volume = 0.5;
@@ -1466,7 +1470,7 @@ export class audioJS { //Heavily modified from: https://codepen.io/jackfuchs/pen
       HEGwebAPI.appendFragment(audiomenuHTML, parentId);
 
       elm("useVol").onclick = () => {
-        if(this.useVol == false) {
+        if(this.useVol === false) {
           this.useVol = true;
           elm("useVol").style.opacity = "1.0";
         }
@@ -1488,13 +1492,13 @@ export class audioJS { //Heavily modified from: https://codepen.io/jackfuchs/pen
       }
 
       elm("modebutton").onclick = () => {
-        if(this.mode == 0) { this.mode = 1;}
-        else if (this.mode == 1){this.mode = 2;}
+        if(this.mode === 0) { this.mode = 1;}
+        else if (this.mode === 1){this.mode = 2;}
         else{ this.mode = 0; }
       }
 
       elm("showhide").onclick = () => {
-        if(this.hidden == false) {
+        if(this.hidden === false) {
           this.hidden = true;
           elm("showhide").innerHTML = "Show UI";
           elm(this.audmenuId).style.display = "none";
@@ -1535,7 +1539,7 @@ export class audioJS { //Heavily modified from: https://codepen.io/jackfuchs/pen
   }
 
   onData(score){
-    if(this.useVol == true) {
+    if(this.useVol === true) {
       var newVol = this.audio.gain.gain.value + score;
       if(newVol > this.maxVol){
         newVol = this.maxVol;
@@ -1543,7 +1547,7 @@ export class audioJS { //Heavily modified from: https://codepen.io/jackfuchs/pen
       if(newVol < 0){
         newVol = 0;
       }
-      if(this.defaultUI == true) {
+      if(this.defaultUI === true) {
         elm("volSlider").value = newVol * 100;
       }
       this.audio.gain.gain.value = newVol;
@@ -1803,13 +1807,13 @@ export class audioJS { //Heavily modified from: https://codepen.io/jackfuchs/pen
  
     draw = () => {
       this.c.width=window.innerWidth;
-      if(this.mode == 0){
+      if(this.mode === 0){
         this.drawMeter(); 
       }
-      else if(this.mode == 1){
+      else if(this.mode === 1){
         this.drawLine();
       }
-      else if(this.mode == 2){
+      else if(this.mode === 2){
         this.drawCircle();
       }
       setTimeout(()=>{this.animationId = requestAnimationFrame(this.draw)},15);
@@ -1829,7 +1833,7 @@ export class hillJS {
 
    this.defaultUI = defaultUI;
    
-   if(defaultUI == true){
+   if(defaultUI === true){
     this.initUI(parentId);
     this.menu = elm(this.canvasmenuId);
    }
@@ -1897,16 +1901,16 @@ export class hillJS {
       this.hillScore = [...Array(this.hillNum).fill(50)];
     }
     elm("hillsModebutton").onclick = () => {
-      if(this.mode == 0) { this.mode = 1;}
+      if(this.mode === 0) { this.mode = 1;}
       else{this.mode = 0;}
     }
     elm("hillsAudbutton").onclick = () => {
-      if(this.soundFX == null){
+      if(this.soundFX === null){
         this.soundFX = new SoundJS(); //Init on gesture
         elm("hillsAudbutton").style.opacity = 1.0;
       }
       else{
-        if(this.soundFX.gain.gain.value == 0){
+        if(this.soundFX.gain.gain.value === 0){
           this.soundFX.gain.gain.value = 1;
           elm("hillsAudbutton").style.opacity = 1.0;
         }
@@ -1924,7 +1928,7 @@ export class hillJS {
     elm("stopbutton").addEventListener('click',  this.cancelDraw, false);
 
     elm("showhide").onclick = () => {
-      if(this.hidden == false) {
+      if(this.hidden === false) {
         this.hidden = true;
         elm("showhide").innerHTML = "Show UI";
         elm(this.canvasmenuId).style.display = "none";
@@ -1989,7 +1993,7 @@ export class hillJS {
     var hscale = 1; //Height scalar
     if(this.hillScore[this.hillScore.length-1] > cheight) {hscale = cheight / this.hillScore[this.hillScore.length-1];}
     this.ctx.clearRect(0, 0, cwidth, cheight);
-    if(this.mode == 0){ // bars
+    if(this.mode === 0){ // bars
       for (var i = 0; i < this.hillNum; i++) {
           var value = this.hillScore[i]*hscale;
           if(value < 0){ value = 0;}
@@ -2008,7 +2012,7 @@ export class hillJS {
           this.ctx.fillRect(i * xoffset /*meterWidth+gap*/ , (cheight - value + this.capHeight), this.meterWidth*wscale, cheight);
       }
     }
-    if(this.mode == 1){ //gradient
+    if(this.mode === 1){ //gradient
       this.ctx.fillStyle = this.gradient;
       this.ctx.beginPath();
       this.ctx.moveTo(0,cheight - this.hillScore[0])
@@ -2016,7 +2020,7 @@ export class hillJS {
         var value = this.hillScore[i]*hscale;
         if(value < 0){ value = 0; }
         this.ctx.lineTo(i*xoffset, (cheight - value))
-        if (i == this.hillNum - 1){      
+        if (i === this.hillNum - 1){      
           this.ctx.lineTo(cwidth,(cheight - value));
         }
       }
@@ -2044,7 +2048,7 @@ export class textReaderJS {
 
     this.defaultUI = defaultUI;
     this.hidden = false;
-    if(defaultUI == true) {
+    if(defaultUI === true) {
       this.text = 'Leap clear of all that is corporeal, and make yourself grown to a like expanse with that greatness which is beyond all measure... rise above all time and become eternal... then you will apprehend God. \
       Think that for you too nothing is impossible; deem that you too are immortal, and that you are able to grasp all things in your thought, to know every craft and science; find your home in the haunts of every living creature; \
       make yourself higher than all heights and lower than all depths; bring together in yourself all opposites of quality, heat and cold, dryness and fluidity; \
@@ -2088,7 +2092,7 @@ export class textReaderJS {
     }
 
     elm("showhide").onclick = () => {
-      if(this.hidden == false) {
+      if(this.hidden === false) {
         this.hidden = true;
         elm("showhide").innerHTML = "Show UI";
         elm(this.canvasId+'menu').style.display = "none";
@@ -2172,7 +2176,7 @@ export class boidsJS { //Birdoids Swarm AI. https://en.wikipedia.org/wiki/Boids
 
       var waitForRenderer = () => { //wait for renderer to load all the particles before beginning the boids algo
         setTimeout(() => {
-          if(this.renderer.particles.length == this.renderer.settings.maxParticles){
+          if(this.renderer.particles.length === this.renderer.settings.maxParticles){
             this.swirlAnchor = [this.renderer.canvas.width*0.45, this.renderer.canvas.height*0.5, 0];
             this.attractorAnchor = this.swirlAnchor;
 
@@ -2223,7 +2227,7 @@ export class boidsJS { //Birdoids Swarm AI. https://en.wikipedia.org/wiki/Boids
         cohesionVec   = [cohesionVec[0] + this.boidsPos[randj][0], cohesionVec[1] + this.boidsPos[randj][1], cohesionVec[2] + this.boidsPos[randj][2]];
         
         separationVec = [separationVec[0] + (this.boidsPos[i][0]-this.boidsPos[randj][0])*(1/disttemp), separationVec[1] + this.boidsPos[i][1]-this.boidsPos[randj][1]*(1/disttemp), separationVec[2] + (this.boidsPos[i][2]-this.boidsPos[randj][2] + 1)*(1/disttemp)];
-        if((separationVec[0] == Infinity) || (separationVec[0] == -Infinity) || (separationVec[0] > 3) || (separationVec[0] < -3) || (separationVec[1] == Infinity) || (separationVec[1] == -Infinity) || (separationVec[1] > 3) || (separationVec[1] < -3) || (separationVec[2] == Infinity) || (separationVec[2] == -Infinity) || (separationVec[2] > 3) || (separationVec[2] < -3) ) {
+        if((separationVec[0] === Infinity) || (separationVec[0] === -Infinity) || (separationVec[0] > 3) || (separationVec[0] < -3) || (separationVec[1] === Infinity) || (separationVec[1] === -Infinity) || (separationVec[1] > 3) || (separationVec[1] < -3) || (separationVec[2] === Infinity) || (separationVec[2] === -Infinity) || (separationVec[2] > 3) || (separationVec[2] < -3) ) {
           separationVec = [Math.random()*4-2,Math.random()*4-2,Math.random()*4-2]; //Special case for when particles overlap and cause infinities
           //console.log("Infinity!")
         }
@@ -2238,11 +2242,11 @@ export class boidsJS { //Birdoids Swarm AI. https://en.wikipedia.org/wiki/Boids
       separationVec = [this.separationMul*separationVec[0],this.separationMul*separationVec[1],this.separationMul*separationVec[2]];
       
       var swirlVec = [0,0,0];
-      if(this.useSwirl == true){
+      if(this.useSwirl === true){
         swirlVec = [-(this.boidsPos[i][1]-this.swirlAnchor[1])*this.swirlMul,(this.boidsPos[i][0]-this.swirlAnchor[0])*this.swirlMul,(this.boidsPos[i][2]-this.swirlAnchor[2])*this.swirlMul];
       }
       var attractorVec = [0,0,0]
-      if(this.useAttractor == true){
+      if(this.useAttractor === true){
         attractorVec = [(this.attractorAnchor[0]-this.boidsPos[i][0])*this.attractorMul,(this.attractorAnchor[1]-this.boidsPos[i][1])*this.attractorMul,(this.attractorAnchor[2]-this.boidsPos[i][2])*this.attractorMul]
       }
       
@@ -2257,7 +2261,7 @@ export class boidsJS { //Birdoids Swarm AI. https://en.wikipedia.org/wiki/Boids
         this.boidsVel[i][2]*this.dragMul+cohesionVec[2]+alignmentVec[2]+separationVec[2]+swirlVec[2]+attractorVec[1]
         ]);
     }
-    if(newVelocities.length == this.boidsCount){ // If newVelocities updated completely, else there was likely an error
+    if(newVelocities.length === this.boidsCount){ // If newVelocities updated completely, else there was likely an error
         //console.log(newVelocities);
         this.boidsVel = newVelocities; //Set new velocities. This will update positions in the draw function which keeps the frame timing
         //console.timeEnd("boid");
@@ -2383,7 +2387,7 @@ export class Particles { //Adapted from this great tutorial: https://modernweb.c
       this.seedsY = [];
       this.currentAngle = 0;
 
-      if(this.useDefaultAnim == true) {
+      if(this.useDefaultAnim === true) {
         this.seedAngles();     // Start off with 100 angles ready to go
       }
 
@@ -2409,7 +2413,7 @@ export class Particles { //Adapted from this great tutorial: https://modernweb.c
         newParticle.vx = 0;
         newParticle.vy = 0;
         // Establish starting positions and velocities
-        if(this.useDefaultAnim == true){
+        if(this.useDefaultAnim === true){
           newParticle.vx = this.seedsX[this.currentAngle];
           newParticle.vy = this.seedsY[this.currentAngle];
           this.currentAngle++;
@@ -2426,7 +2430,7 @@ export class Particles { //Adapted from this great tutorial: https://modernweb.c
 
         this.particleIndex++;
       } else {
-        if(this.useDefaultAnim == true){
+        if(this.useDefaultAnim === true){
           //console.log('Generating more seed angles');
           this.seedAngles();
           this.currentAngle = 0;
@@ -2557,7 +2561,7 @@ export class BufferLoader { //From HTML5 Rocks tutorial
         request.open("GET", url, true);
         request.onreadystatechange = () => {
           if(request.readyState === 4){
-            if(request.status === 200 || request.status == 0){
+            if(request.status === 200 || request.status === 0){
               responseBuf = request.response; //Local files work on a webserver with request
             }
           }
@@ -2574,7 +2578,7 @@ export class BufferLoader { //From HTML5 Rocks tutorial
               return;
             }
             loader.bufferList[index] = buffer;
-            if (++loader.loadCount == loader.urlList.length)
+            if (++loader.loadCount === loader.urlList.length)
               loader.onload(loader.bufferList);
           },
           function(error) {
@@ -2608,7 +2612,7 @@ export class BufferLoader { //From HTML5 Rocks tutorial
               console.log('File decoded successfully!')
             }
             loader.bufferList[index] = buffer;
-            if (++loader.loadCount == loader.urlList.length)
+            if (++loader.loadCount === loader.urlList.length)
               loader.onload(loader.bufferList);
             },
             function(error) {
@@ -2712,7 +2716,7 @@ export class SoundJS { //Only one Audio context at a time!
   }
 
   playSound(bufferIndex, seconds=0, repeat=false, startTime=this.ctx.currentTime){//Plays sounds loaded in buffer by index. Sound buffers are single use items.
-    if(repeat == true){
+    if(repeat === true){
       this.sourceList[bufferIndex].loop = true;
     }
     
@@ -2736,7 +2740,7 @@ export class SoundJS { //Only one Audio context at a time!
       devices = devices.filter((d) => d.kind === 'audioinput');
       devices.forEach(function(device) {
         let menu = elm("inputdevices");
-        if (device.kind == "audioinput") {
+        if (device.kind === "audioinput") {
           let item = document.createElement("option");
           item.innerHTML = device.label;
           item.value = device.deviceId;
@@ -2746,11 +2750,11 @@ export class SoundJS { //Only one Audio context at a time!
     }); //Device selection
 
     navigator.permissions.query({name:'microphone'}).then(function(result) {
-      if (result.state == 'granted') {
+      if (result.state === 'granted') {
 
-      } else if (result.state == 'prompt') {
+      } else if (result.state === 'prompt') {
 
-      } else if (result.state == 'denied') {
+      } else if (result.state === 'denied') {
 
       }
       result.onchange = function() {
@@ -2780,7 +2784,7 @@ export class SoundJS { //Only one Audio context at a time!
           'video/webm;codecs=h264,vp9,opus',
           'video/x-matroska;codecs=avc1'
         ];
-      } else if (args.audio == true) {
+      } else if (args.audio === true) {
         types = [
           'audio/wav', // might be supported native, otherwise see:
           'audio/mp3', // probably not supported
@@ -2794,7 +2798,7 @@ export class SoundJS { //Only one Audio context at a time!
     }
 
     for (var i=0; i<types.length; i++) {
-      if(MediaRecorder.isTypeSupported(types[i]) == true){
+      if(MediaRecorder.isTypeSupported(types[i]) === true){
         supported = types[i];
         console.log("Supported type: ", supported);
         if(types[i].indexOf('webm') !== -1){
