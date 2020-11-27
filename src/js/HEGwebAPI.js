@@ -1,3 +1,5 @@
+import { elm } from "../util/util";
+
 export class HEGwebAPI { //Create HEG sessions, define custom data stream params as needed.
   constructor(host='', header=["us","Red","IR","Ratio","Ambient","drdt","ddrdt"], delimiter="|", uIdx=0, rIdx=3, defaultUI=true, parentId="main_body"){
     
@@ -8,23 +10,23 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
     this.clock = [];
     this.useMs = false;
 
-    this.ratio=[];
+    this.ratio = [];
 
-    this.startTime=    0;
-    this.slowSMA =     0;
+    this.startTime  = 0;
+    this.slowSMA    = 0;
     this.slowSMAarr = [0];
-    this.fastSMA =     0;
+    this.fastSMA    = 0;
     this.fastSMAarr = [0];
-    this.smaSlope =    0;
-    this.scoreArr =   [0];
-    this.replay =   false;
+    this.smaSlope   = 0;
+    this.scoreArr   = [0];
+    this.replay     = false;
     
-    this.csvDat =     [];
-    this.csvIndex =    0;
+    this.csvDat     = [];
+    this.csvIndex   = 0;
 
-    this.curIndex =    0;
-    this.noteIndex =  [];
-    this.noteText =   [];
+    this.curIndex   = 0;
+    this.noteIndex  = [];
+    this.noteText   = [];
 
     this.host = host;
     this.source="";
@@ -37,12 +39,12 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
     this.uIdx = uIdx; //Index of timing value (microseconds presumed)
     this.rIdx = rIdx; //Index of HEG Ratio
 
-    //window.requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.msRequestAnimationFrame;
-    //window.cancelAnimationFrame = window.cancelAnimationFrame || window.webkitCancelAnimationFrame || window.mozCancelAnimationFrame || window.msCancelAnimationFrame;
+    window.requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.msRequestAnimationFrame;
+    window.cancelAnimationFrame = window.cancelAnimationFrame || window.webkitCancelAnimationFrame || window.mozCancelAnimationFrame || window.msCancelAnimationFrame;
     
     this.defaultUI = defaultUI;
     this.ui = false;
-    if(defaultUI==true){
+    if (defaultUI==true) {
       this.parentId = parentId;
       this.createUI(parentId,header);
     }
@@ -94,13 +96,13 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
 
       fragment.appendChild(newDiv);
 
-      document.getElementById(parentId).appendChild(fragment);
+      elm(parentId).appendChild(fragment);
   }
 
   //delete selected fragment. Will delete the most recent fragment if Ids are shared.
   static deleteFragment(parentId,fragmentId) {
-      var this_fragment = document.getElementById(fragmentId);
-      document.getElementById(parentId).removeChild(this_fragment);
+      var this_fragment = elm(fragmentId);
+      elm(parentId).removeChild(this_fragment);
   }
 
   //Separates the appendId from the fragmentId so you can make multiple child threads with different Ids
@@ -113,26 +115,26 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
 
       fragment.appendChild(newDiv);
 
-      document.getElementById(parentId).appendChild(fragment);
+      elm(parentId).appendChild(fragment);
   }
 
   //Remove Element By Id
   static removeElement(elementId) {
     // Removes an element from the document
-    var element = document.getElementById(elementId);
+    var element = elm(elementId);
     element.parentNode.removeChild(element);
   }
 
   //Remove Element Parent By Element Id (for those pesky anonymous child fragment containers)
   static removeParent(elementId) {
     // Removes an element from the document
-    var element = document.getElementById(elementId);
+    var element = elm(elementId);
     element.parentNode.parentNode.removeChild(element.parentNode);
   }
 
   //Remove the parent of a parent of an element (for even more pesky anonymous nested fragment containers) 
   static removeParentParent(elementId){
-    var element = document.getElementById(elementId);
+    var element = elm(elementId);
     element.parentNode.parentNode.parentNode.removeChild(element.parentNode.parentNode);
 
   }
@@ -158,8 +160,8 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
   }
 
   smaScore(input) {
-    this.slowSMAarr = HEGwebAPI.sma(input,40);
-    this.fastSMAarr = HEGwebAPI.sma(input,20);
+    this.slowSMAarr = HEGwebAPI.sma(input, 40);
+    this.fastSMAarr = HEGwebAPI.sma(input, 20);
     this.fastSMA = this.fastSMAarr[this.fastSMAarr.length - 1];
     this.slowSMA = this.slowSMAarr[this.slowSMAarr.length - 1];
 
@@ -173,7 +175,7 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
     data.forEach((line, i) => {
       csvDat += line.split(delimiter).join(",");
       if(saveNotes == true){
-        if(this.noteIndex.indexOf(i) != -1) {csvDat+=","+[this.noteText[this.noteIndex.indexOf(i)]]}
+        if(this.noteIndex.indexOf(i) !== -1) {csvDat+=","+[this.noteText[this.noteIndex.indexOf(i)]]}
       }
       if(line.indexOf('\n') < 0) {csvDat+="\n";}
     });
@@ -181,7 +183,7 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
     var hiddenElement = document.createElement('a');
     hiddenElement.href = "data:text/csv;charset=utf-8," + encodeURI(csvDat);
     hiddenElement.target = "_blank";
-    if(name != ""){
+    if(name !== ""){
         hiddenElement.download = name+".csv";
     }
     else{
@@ -215,7 +217,7 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
      input.value = '';
     }
     input.click();
-} 
+  } 
 
   handleScore() {
     //Define in-script
@@ -277,11 +279,11 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
     input.click();
   }
 
-  handleEventData(data, delimiter="|", uIdx=0, rIdx=3){ // Can set custom delimiters, time counters (us) index, and ratio index of incoming data.
-    console.log("HEGDUINO", data);
-    if(this.raw[this.raw.length - 1] != data){  //on new output
+  handleEventData(data, delimiter="|", uIdx=0, rIdx=3) { // Can set custom delimiters, time counters (us) index, and ratio index of incoming data.
+    // console.log("handleEventData", data);
+    if(this.raw[this.raw.length - 1] !== data){  //on new output
       if(this.ui == true){
-        document.getElementById("heg").innerHTML = data;
+        elm("heg").innerHTML = data;
       }
       //Create event for posting data from an iframe implementation of this code.
       var onRead = new CustomEvent('on_read', { detail: {data: data} }); 
@@ -331,11 +333,11 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
   openEvent = (e) => {
     this.alloutput.push(e.data);
     console.log("HEGDUINO", "Events Connected");
-    //document.getElementById("message").innerHTML = "Output:";
+    //elm("message").innerHTML = "Output:";
   }
 
   errorEvent = (e) => {
-    if (e.target.readyState != EventSource.OPEN) {
+    if (e.target.readyState !== EventSource.OPEN) {
       this.alloutput.push(e.data);
       console.log("HEGDUINO", "Events Disconnected");
     }
@@ -344,15 +346,14 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
   messageEvent = (e) => {
     console.log("HEGDUINO", e.data);
     this.alloutput.push(e.data);
-    //document.getElementById("message").innerHTML = e.data;
+    //elm("message").innerHTML = e.data;
   }
 
   //Event with incoming data
-  hegEvent = (e) => {
+  hegEvent = (e) =>
     this.handleEventData(e.data,this.delimiter,this.uIdx,this.rIdx);
-  }
 
-  createEventListeners(host='') { //Set custom hostname (e.g. http://192.168.4.1). Leave blank for local hosted sessions (i.e. served from the board)
+  createEventListeners(host = '') { //Set custom hostname (e.g. http://192.168.4.1). Leave blank for local hosted sessions (i.e. served from the board)
     if (!!window.EventSource) {
       this.source = new EventSource(host+'/events');
       this.source.addEventListener('open', this.openEvent, false);
@@ -363,30 +364,30 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
   }
 
   removeEventListeners() {
-    if(window.EventSource){
-    this.source.close();
-    this.source.removeEventListener('open', this.openEvent, false);
-    this.source.removeEventListener('error', this.errorEvent, false);
-    this.source.removeEventListener('message', this.messageEvent, false);
-    this.source.removeEventListener('heg', this.hegEvent, false);
+    if (window.EventSource) {
+      this.source.close();
+      this.source.removeEventListener('open', this.openEvent, false);
+      this.source.removeEventListener('error', this.errorEvent, false);
+      this.source.removeEventListener('message', this.messageEvent, false);
+      this.source.removeEventListener('heg', this.hegEvent, false);
     }
   }
 
-  updateStreamHeader(header=this.header){
+  updateStreamHeader(header=this.header) {
     var HTMLtoAppend = '<tr>';
     header.forEach((value)=>{HTMLtoAppend += '<th>'+value+'</th>'});
     HTMLtoAppend += '</tr>'
-    document.getElementById("dataNames").innerHTML = HTMLtoAppend;
+    elm("dataNames").innerHTML = HTMLtoAppend;
   }
 
-  updateStreamRow(dataArray){
+  updateStreamRow(dataArray) {
     var HTMLtoAppend = '<tr>';
     dataArray.forEach((value)=>{HTMLtoAppend += '<td>'+value+'</td>'});
     HTMLtoAppend += '</tr>'
-    document.getElementById("dataTable").innerHTML = HTMLtoAppend;
+    elm("dataTable").innerHTML = HTMLtoAppend;
   }
 
-  makeStreamTable(header=this.header){
+  makeStreamTable(header=this.header) {
     var tableHeadHTML = '<div id="tableHead"><table class="dattable" id="dataNames"></table></div>';
     var tableDatHTML = '<div id="tableDat"><table class="dattable" id="dataTable"><tr><td>Awaiting Data...</td></tr></table></div>';
     HEGwebAPI.appendFragment(tableHeadHTML,"sTableContainer");
@@ -437,35 +438,35 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
 
     this.makeStreamTable(header);
     
-    document.getElementById("getTime").onclick = () => {
+    elm("getTime").onclick = () => {
       this.curIndex = this.clock.length - 1;
-      if(this.useMs == true) { document.getElementById("timestamp").innerHTML = (this.clock[this.clock.length - 1] * 0.001).toFixed(2) + "s"; }
-      else { document.getElementById("timestamp").innerHTML = (this.clock[this.clock.length - 1] * 0.000001).toFixed(2) + "s"; }
+      if(this.useMs == true) { elm("timestamp").innerHTML = (this.clock[this.clock.length - 1] * 0.001).toFixed(2) + "s"; }
+      else { elm("timestamp").innerHTML = (this.clock[this.clock.length - 1] * 0.000001).toFixed(2) + "s"; }
     }
 
-    document.getElementById("saveNote").onclick = () => {
+    elm("saveNote").onclick = () => {
       this.noteIndex.push(this.curIndex);
-      this.noteText.push(document.getElementById("noteText").value);
-      document.getElementById("noteText").value = "";
+      this.noteText.push(elm("noteText").value);
+      elm("noteText").value = "";
       this.curIndex = -1;
-      document.getElementById("timestamp").innerHTML = "Get Current Time";
+      elm("timestamp").innerHTML = "Get Current Time";
     }
 
-    document.getElementById("savecsv").onclick = () => {this.saveCSV();}
-    document.getElementById("replaycsv").onclick = () => {this.openCSV();}
+    elm("savecsv").onclick = () => {this.saveCSV();}
+    elm("replaycsv").onclick = () => {this.openCSV();}
 
-    document.getElementById("resetSession").onclick = () => {this.resetVars();}
+    elm("resetSession").onclick = () => {this.resetVars();}
 
-    this.sensitivity = document.getElementById("sensitivity");
-    document.getElementById("reset_s").onclick = () => { 
+    this.sensitivity = elm("sensitivity");
+    elm("reset_s").onclick = () => { 
       this.sensitivity.value = 100; 
-      document.getElementById("sensitivityVal").innerHTML = (this.sensitivity.value * 0.01).toFixed(2);
+      elm("sensitivityVal").innerHTML = (this.sensitivity.value * 0.01).toFixed(2);
     }
-    document.getElementById("sensitivity").oninput = () => {
-      document.getElementById("sensitivityVal").innerHTML = (this.sensitivity.value * 0.01).toFixed(2);
+    elm("sensitivity").oninput = () => {
+      elm("sensitivityVal").innerHTML = (this.sensitivity.value * 0.01).toFixed(2);
     }
 
-    document.getElementById("startbutton").onclick = () => {
+    elm("startbutton").onclick = () => {
       var xhr = new XMLHttpRequest();
       xhr.open('POST', this.host+"/startHEG", true);
       xhr.send();
@@ -473,16 +474,16 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
       //xhr.abort();
     }
 
-    document.getElementById("stopbutton").onclick = () => {
+    elm("stopbutton").onclick = () => {
       var xhr = new XMLHttpRequest();
       xhr.open('POST', this.host+"/stopHEG", true);
       xhr.send();
       xhr.onerror = function() { xhr.abort(); }
       //xhr.abort();
     }
-    document.getElementById("sendbutton").onclick = () => {
+    elm("sendbutton").onclick = () => {
       var data = new FormData();
-      data.append('command', document.getElementById('command').value);
+      data.append('command', elm('command').value);
       var xhr = new XMLHttpRequest();
       xhr.open('POST', this.host+'/command', true);
       xhr.send(data);
@@ -490,18 +491,18 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
       //xhr.abort();
     }
 
-    document.getElementById("submithost").onclick = () => {
+    elm("submithost").onclick = () => {
       if(window.EventSource){ 
         this.removeEventListeners();
       }
-      if(document.getElementById("hostname").value.length > 2) {
-        this.host = document.getElementById("hostname").value;
+      if(elm("hostname").value.length > 2) {
+        this.host = elm("hostname").value;
       }
       else{
         this.host = "http://192.168.4.1";
       }
 
-      document.getElementById("startbutton").onclick = () => {
+      elm("startbutton").onclick = () => {
         var xhr = new XMLHttpRequest();
         xhr.open('POST', this.host+"/startHEG", true);
         xhr.send();
@@ -509,16 +510,16 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
         //xhr.abort();
       }
   
-      document.getElementById("stopbutton").onclick = () => {
+      elm("stopbutton").onclick = () => {
         var xhr = new XMLHttpRequest();
         xhr.open('POST', this.host+"/stopHEG", true);
         xhr.send();
         xhr.onerror = function() { xhr.abort(); }
         //xhr.abort();
       }
-      document.getElementById("sendbutton").onclick = () => {
+      elm("sendbutton").onclick = () => {
         var data = new FormData();
-        data.append('command', document.getElementById('command').value);
+        data.append('command', elm('command').value);
         var xhr = new XMLHttpRequest();
         xhr.open('POST', this.host+'/command', true);
         xhr.send(data);
@@ -527,8 +528,8 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
       }
 
       this.createEventListeners(this.host);
-      //var thisNode = document.getElementById("dataDiv").parentNode.parentNode;
-      //thisNode.removeChild(document.getElementById("dataDiv").parentNode);
+      //var thisNode = elm("dataDiv").parentNode.parentNode;
+      //thisNode.removeChild(elm("dataDiv").parentNode);
       //this.createUI(thisNode.id);
       console.log("Attempting connection at " + this.host);
     }
@@ -631,7 +632,7 @@ export class graphJS {
     this.createShader();
     this.createVertices(color);
     
-    this.graphtext = document.getElementById(this.textId).getContext("2d");
+    this.graphtext = elm(this.textId).getContext("2d");
 
     this.draw();
 
@@ -666,10 +667,10 @@ export class graphJS {
 
     HEGwebAPI.appendFragment(graphOptions, parentId);
 
-    this.xoffsetSlider = document.getElementById("xoffset");
-    this.xscaleSlider = document.getElementById("xscale");
-    this.yoffsetSlider = document.getElementById("yoffset");
-    this.yscaleSlider = document.getElementById("yscale");
+    this.xoffsetSlider = elm("xoffset");
+    this.xscaleSlider = elm("xscale");
+    this.yoffsetSlider = elm("yoffset");
+    this.yscaleSlider = elm("yscale");
 
     this.yoffsetSlider.oninput = () => {
       this.yoffset = (this.yoffsetSlider.value - 5000) * 0.002;
@@ -680,18 +681,18 @@ export class graphJS {
       this.invScale = 1/this.yscale;
     }
 
-    document.getElementById("yoffsetbutton").onclick = () => {
+    elm("yoffsetbutton").onclick = () => {
       this.yoffset = 0;
     }
 
-    document.getElementById("yscalebutton").onclick = () => {
+    elm("yscalebutton").onclick = () => {
       this.yscaleSlider.value = 200;
       this.yscale = 1;
       this.invScale = 1;
     }
 
-    document.getElementById("autoscale").onclick = () => {
-      this.autoscale = document.getElementById("autoscale").checked;
+    elm("autoscale").onclick = () => {
+      this.autoscale = elm("autoscale").checked;
     }
     var radios = document.graphform.graphview;
     for (var i = 0; i < radios.length; i++) {
@@ -803,9 +804,11 @@ export class graphJS {
     }
   }
 
-  normalize(val, max=255, min=0) { return (val - min) / (max - min); }
+  normalize = (val, max = 255, min = 0) => (val - min) / (max - min);
+  
 
   draw = () => {
+
     //Create main graph
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
@@ -826,65 +829,71 @@ export class graphJS {
     this.gl.drawArrays(this.gl.LINES, 0, 6);
     
     //Data line
-    if(this.viewing == 0){
+    if (this.viewing == 0)
       this.vertices = this.makePoints(this.VERTEX_LENGTH, this.graphY1);
-    }
-    if(this.viewing == 1){
+
+    if (this.viewing == 1)
       this.vertices = this.makePoints(this.VERTEX_LENGTH, this.graphY2);
-    }
+
     this.createVertices(this.vertices);
     this.gl.bufferSubData(this.gl.ARRAY_BUFFER, 0, new Float32Array(this.vertices));
     this.gl.drawArrays(this.gl.LINE_STRIP, 0, this.VERTEX_LENGTH);
     //Create text overlay -- TODO: Only update on change so it's not constantly redrawing
     this.graphtext.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-    if(window.innerWidth > 700){
-      this.graphtext.canvas.height = this.canvas.height*(window.innerHeight/window.innerWidth)*1.3;
-    }
-    else{
+    if (window.innerWidth > 700)
+      this.graphtext.canvas.height = this.canvas.height * (window.innerHeight / window.innerWidth) * 1.3;
+    else
       this.graphtext.canvas.height = this.canvas.height;
-    }
-    this.graphtext.canvas.width = this.canvas.width*1.3;
+    
+    this.graphtext.canvas.width = this.canvas.width * 1.3;
     this.graphtext.font = "2em Arial";
 
+    const cvWidth = this.graphtext.canvas.width;
+    const cvHeight = this.graphtext.canvas.height;
+    const xoffset = cvWidth * 0.125;
+
     var seconds = 0;
-    if(this.useMs == true){
-      seconds = Math.floor(this.clock*0.001);
-    }
-    else {
-      seconds = Math.floor(this.clock*0.000001);
-    }
-    var minutes = Math.floor(seconds*0.01667);
-    seconds = seconds - minutes * 60
-    if(seconds < 10){seconds = "0"+seconds}
-    if(this.viewing == 0) {
+    if (this.useMs === true)
+      seconds = Math.floor(this.clock * 0.001)
+    else
+      seconds = Math.floor(this.clock * 0.000001);
+
+    var minutes = Math.floor(seconds * 0.01667);
+
+    seconds = seconds - minutes * 60;
+    if(seconds < 10) seconds = "0" + seconds;
+
+
+    if (this.viewing === 0) {
       this.graphtext.fillStyle = "#00ff00";
-      this.graphtext.fillText("  Time: " + minutes + ":" + seconds,this.graphtext.canvas.width - 300,50);
-      this.graphtext.fillText("  Ratio: " + this.ratio.toFixed(2), this.graphtext.canvas.width - 500,50);
+      this.graphtext.fillText("  Time: " + minutes + ":" + seconds, cvWidth - 300,50);
+      this.graphtext.fillText("  Ratio: " + this.ratio.toFixed(2), cvWidth - 500,50);
       this.graphtext.fillStyle = "#99ffbb";
-      this.graphtext.fillText("    Score: " + this.graphY1[this.graphY1.length - 1].toFixed(2),this.graphtext.canvas.width - 720,50);
+      this.graphtext.fillText("    Score: " + this.graphY1[this.graphY1.length - 1].toFixed(2), cvWidth - 720,50);
     }
-    if(this.viewing == 1) {
+    if (this.viewing == 1) {
       this.graphtext.fillStyle = "#00ff00";
-      this.graphtext.fillText("  Time: " + minutes + ":" + seconds,this.graphtext.canvas.width - 300,50);
-      this.graphtext.fillText("    Score: " + this.graphY1[this.graphY1.length - 1].toFixed(2) + "  ",this.graphtext.canvas.width - 720,50);
+      this.graphtext.fillText("  Time: " + minutes + ":" + seconds, cvWidth - 300,50);
+      this.graphtext.fillText("    Score: " + this.graphY1[this.graphY1.length - 1].toFixed(2) + "  ", cvWidth - 720,50);
       this.graphtext.fillStyle = "#99ffbb";
-      this.graphtext.fillText("   Ratio: " + this.ratio.toFixed(2), this.graphtext.canvas.width - 500,50);
+      this.graphtext.fillText("   Ratio: " + this.ratio.toFixed(2), cvWidth - 500,50);
     }
+
     this.graphtext.fillStyle = "#707070";
-    var xoffset = this.graphtext.canvas.width * 0.125;
-    this.graphtext.fillText((this.invScale * 0.75 - this.yoffset).toFixed(3), xoffset, this.graphtext.canvas.height * 0.125); 
-    this.graphtext.fillText((this.invScale * 0.5 - this.yoffset).toFixed(3), xoffset, this.graphtext.canvas.height * 0.25); 
-    this.graphtext.fillText((this.invScale * 0.25 - this.yoffset).toFixed(3), xoffset, this.graphtext.canvas.height * 0.375); 
-    this.graphtext.fillText((this.invScale * -0.25 - this.yoffset).toFixed(3), xoffset, this.graphtext.canvas.height * 0.625); 
-    this.graphtext.fillText((this.invScale * -0.5 - this.yoffset).toFixed(3), xoffset, this.graphtext.canvas.height * 0.75); 
-    this.graphtext.fillText((this.invScale * -0.75 - this.yoffset).toFixed(3), xoffset, this.graphtext.canvas.height * 0.875); 
+
+    [
+      [0.75, 0.125],  [0.5, 0.25],
+      [0.25, 0.375],  [-0.25, 0.625],
+      [-0.5, 0.75],   [-0.75, 0.875]
+    ].map(([x, y]) => this.graphtext.fillText(
+        (this.invScale * x - this.yoffset).toFixed(3), xoffset, cvHeight * y))
     
-    if(this.sampleRate != null) { //X-axis approximation.
+    if (this.sampleRate !== null) { // X-axis approximation.
       this.graphtext.fillStyle = "#303030";
-      this.graphtext.fillText((Math.ceil(this.sampleRate * this.VERTEX_LENGTH * 0.5)).toFixed(0)+"s", this.graphtext.canvas.width * 0.501, this.graphtext.canvas.height * 0.85);
-      this.graphtext.fillText((Math.ceil(this.sampleRate * this.VERTEX_LENGTH * 0.25)).toFixed(0)+"s", this.graphtext.canvas.width * 0.751, this.graphtext.canvas.height * 0.85);
-      this.graphtext.fillText((Math.ceil(this.sampleRate * this.VERTEX_LENGTH * 0.75)).toFixed(0)+"s", this.graphtext.canvas.width * 0.251, this.graphtext.canvas.height * 0.85);
+      this.graphtext.fillText((Math.ceil(this.sampleRate * this.VERTEX_LENGTH * 0.5)).toFixed(0)+"s", cvWidth * 0.501, cvHeight * 0.85);
+      this.graphtext.fillText((Math.ceil(this.sampleRate * this.VERTEX_LENGTH * 0.25)).toFixed(0)+"s", cvWidth * 0.751, cvHeight * 0.85);
+      this.graphtext.fillText((Math.ceil(this.sampleRate * this.VERTEX_LENGTH * 0.75)).toFixed(0)+"s", cvWidth * 0.251, cvHeight * 0.85);
     }
     //console.log("Graph updated", Date.now());
     setTimeout(()=>{this.animationId = requestAnimationFrame(this.draw);},40); 
@@ -897,7 +906,7 @@ export class circleJS {
   constructor(bgColor="#34baeb", cColor="#ff3a17", res=[window.innerWidth,"440"], parentId="main_body", canvasId="circlecanvas", defaultUI=true, canvasmenuId="circlecanvasmenu"){
     
     this.createCanvas(parentId, canvasId, res);
-    this.c = document.getElementById(canvasId);
+    this.c = elm(canvasId);
     this.ctx = this.c.getContext('2d');
     this.parentId = parentId;
     this.canvasId = canvasId;
@@ -938,36 +947,36 @@ export class circleJS {
 
     HEGwebAPI.appendFragment(uiHTML, parentId);
     
-    document.getElementById("circleAudiobutton").style.opacity = 0.3;
+    elm("circleAudiobutton").style.opacity = 0.3;
 
-    document.getElementById("circleAudiobutton").onclick = () => {
+    elm("circleAudiobutton").onclick = () => {
       if(this.soundFX == null) { 
         this.soundFX = new SoundJS(); 
         this.soundFX.gain.gain.value = 0.1;
         this.soundFX.playFreq([300]);
-        document.getElementById("circleAudiobutton").style.opacity = 1.0;
+        elm("circleAudiobutton").style.opacity = 1.0;
       }
       else{
         if(this.soundFX.gain.gain.value == 0) {
           this.soundFX.gain.gain.value = 0.1;
-          document.getElementById("circleAudiobutton").style.opacity = 1.0;
+          elm("circleAudiobutton").style.opacity = 1.0;
         }
         else {
           this.soundFX.gain.gain.value = 0;
-          document.getElementById("circleAudiobutton").style.opacity = 0.3;
+          elm("circleAudiobutton").style.opacity = 0.3;
         }
       }
     }
 
-    document.getElementById("showhide").onclick = () => {
+    elm("showhide").onclick = () => {
       if(this.hidden == false){
-        document.getElementById(canvasmenuId).style.display = 'none';
-        document.getElementById("showhide").innerHTML = "Show UI";
+        elm(canvasmenuId).style.display = 'none';
+        elm("showhide").innerHTML = "Show UI";
         this.hidden = true;
       }
       else{
-        document.getElementById(canvasmenuId).style.display = '';
-        document.getElementById("showhide").innerHTML = "Hide UI";
+        elm(canvasmenuId).style.display = '';
+        elm("showhide").innerHTML = "Hide UI";
         this.hidden = false;
       }
     }
@@ -975,7 +984,7 @@ export class circleJS {
 
   deInit() {
     cancelAnimationFrame(this.animationId);
-    if(this.soundFX != null){
+    if(this.soundFX !== null){
       this.soundFX.osc[0].stop(0);
     }
   }
@@ -1015,7 +1024,7 @@ export class circleJS {
 
       if(((this.angle > 1.57) || (this.angleChange > 0)) && ((this.angle < 3.14) || (this.angleChange < 0))){ //generalize
           this.angle += this.angleChange*0.1;
-          if(this.soundFX != null){
+          if(this.soundFX !== null){
             this.soundFX.osc[0].frequency.value += this.angleChange*100;
           }
       }
@@ -1084,11 +1093,11 @@ export class videoJS {
 
       setupButtons() {
 
-        document.getElementById("startbutton").addEventListener('click', this.startVideo, false);
+        elm("startbutton").addEventListener('click', this.startVideo, false);
         
-        document.getElementById("stopbutton").addEventListener('click', this.stopVideo, false);
+        elm("stopbutton").addEventListener('click', this.stopVideo, false);
         
-        document.getElementById("play").onclick = () => {
+        elm("play").onclick = () => {
           if(this.vidQuery.playbackRate == 0){
             if(this.useRate == true){
               this.vidQuery.playbackRate = this.playRate;
@@ -1097,71 +1106,71 @@ export class videoJS {
               this.playRate = 1;
               this.vidQuery.playbackRate = 1;
             }
-            document.getElementById("play").innerHTML = "||";
+            elm("play").innerHTML = "||";
           }
           else{
             this.vidQuery.playbackRate = 0;
-            document.getElementById("play").innerHTML = ">";
+            elm("play").innerHTML = ">";
           }
         }
         
-        document.getElementById("useAlpha").onclick = () => {
+        elm("useAlpha").onclick = () => {
          if(this.useAlpha == true){
            this.useAlpha = false;
            this.alpha = 0;
-           document.getElementById("useAlpha").style.opacity = "0.3";
+           elm("useAlpha").style.opacity = "0.3";
          }
-         else{ this.useAlpha = true; document.getElementById("useAlpha").style.opacity = "1.0";}
+         else{ this.useAlpha = true; elm("useAlpha").style.opacity = "1.0";}
         }
 
-        document.getElementById("useRate").onclick = () => {
+        elm("useRate").onclick = () => {
          if(this.useRate == true){
            this.useRate = false;
            this.playRate = 1;
            this.vidQuery.playbackRate = 1;
-           document.getElementById("useRate").style.opacity = "0.3";
+           elm("useRate").style.opacity = "0.3";
          }
          else{ 
            this.useTime = false; 
            this.useRate = true; 
            this.playRate = 1; 
            this.vidQuery.playbackRate = 1;
-           document.getElementById("useRate").style.opacity = "1.0";
-           document.getElementById("useTime").style.opacity = "0.3";
+           elm("useRate").style.opacity = "1.0";
+           elm("useTime").style.opacity = "0.3";
           }
         }
 
-        document.getElementById("useVol").onclick = () => {
+        elm("useVol").onclick = () => {
          if(this.useVol == true){
            this.vidQuery.muted = true;
            this.useVol = false;
            this.volume = 0;
            this.vidQuery.volume = 0;
-           document.getElementById("useVol").style.opacity = "0.3";
+           elm("useVol").style.opacity = "0.3";
          }
          else{ 
           this.useVol = true; 
           this.vidQuery.muted = false; 
           this.volume = 0.5; 
           this.vidQuery.volume = 0.5;
-          document.getElementById("useVol").style.opacity = "1.0";
+          elm("useVol").style.opacity = "1.0";
           }
         }
 
-        document.getElementById("useTime").onclick = () => {
+        elm("useTime").onclick = () => {
           if(this.useTime == true){
             this.useTime = false;
             this.playRate = 1;
             this.vidQuery.playbackRate = 1;
-            document.getElementById("useTime").style.opacity = "0.3";
+            elm("useTime").style.opacity = "0.3";
           }
           else {
             this.useRate = false;
             this.useTime = true;
             this.playRate = 0;
             this.vidQuery.playbackRate = 0;
-            document.getElementById("useRate").style.opacity = "0.3";
-            document.getElementById("useTime").style.opacity = "1.0";
+            elm("useRate").style.opacity = "0.3";
+            elm("useTime").style.opacity = "1.0";
           }
         }
 
@@ -1185,40 +1194,40 @@ export class videoJS {
           this.sliderfocus = false;
         }
 
-        document.getElementById("minus1min").onclick = () => {
+        elm("minus1min").onclick = () => {
           this.vidQuery.currentTime -= 60;
         }
-        document.getElementById("plus1min").onclick = () => {
+        elm("plus1min").onclick = () => {
           this.vidQuery.currentTime += 60;
         }
-        document.getElementById("minus10sec").onclick = () => {
+        elm("minus10sec").onclick = () => {
           this.vidQuery.currentTime -= 10;
         }
-        document.getElementById("plus10sec").onclick = () => {
+        elm("plus10sec").onclick = () => {
           this.vidQuery.currentTime += 10;
         }
 
-        document.getElementById("showhide").onclick = () => {
+        elm("showhide").onclick = () => {
           if(this.hidden == false) {
             this.hidden = true;
-            document.getElementById("showhide").innerHTML = "Show UI";
-            document.getElementById("vidbuttons").style.display = "none";
-            document.getElementById("timeDiv").style.display = "none";
-            document.getElementById("fs").style.display = "none";
+            elm("showhide").innerHTML = "Show UI";
+            elm("vidbuttons").style.display = "none";
+            elm("timeDiv").style.display = "none";
+            elm("fs").style.display = "none";
           }
           else{
             this.hidden = false;
-            document.getElementById("showhide").innerHTML = "Hide UI";
-            document.getElementById("vidbuttons").style.display = "";
-            document.getElementById("timeDiv").style.display = "";
-            document.getElementById("fs").style.display = "";
+            elm("showhide").innerHTML = "Hide UI";
+            elm("vidbuttons").style.display = "";
+            elm("timeDiv").style.display = "";
+            elm("fs").style.display = "";
           }
         }
       }
 
       deInit(){
-        document.getElementById("startbutton").removeEventListener('click', this.startVideo);
-        document.getElementById("stopbutton").removeEventListener('click', this.stopVideo);
+        elm("startbutton").removeEventListener('click', this.startVideo);
+        elm("stopbutton").removeEventListener('click', this.stopVideo);
         cancelAnimationFrame(this.animationId);
       }
 
@@ -1237,8 +1246,8 @@ export class videoJS {
         </div>';
        HEGwebAPI.appendFragment(videoapiHTML, parentId);
 
-       document.getElementById("useTime").style.opacity = "0.3";
-       this.timeSlider = document.getElementById("timeSlider");
+       elm("useTime").style.opacity = "0.3";
+       this.timeSlider = elm("timeSlider");
 
        this.localFileVideoPlayer();
       }
@@ -1332,13 +1341,13 @@ export class videoJS {
     }
 
     init(defaultUI) {
-       this.vidQuery = document.getElementById(this.vidContainerId+'vid');
+       this.vidQuery = elm(this.vidContainerId+'vid');
        if(this.useVol == true){
         this.vidQuery.muted = false;
         this.vidQuery.volume = 0.5;
         this.volume = 0.5;
        } 
-       this.c = document.getElementById(this.vidContainerId+'canvas');
+       this.c = elm(this.vidContainerId+'canvas');
        this.c.width = this.vidQuery.width;
        this.c.height = this.vidQuery.height;
        var rect = this.vidQuery.getBoundingClientRect();
@@ -1368,7 +1377,7 @@ export class audioJS { //Heavily modified from: https://codepen.io/jackfuchs/pen
 
     HEGwebAPI.appendFragment(visualizerHTML, parentId);
 
-    this.c = document.getElementById(this.audioId+"canvas");
+    this.c = elm(this.audioId+"canvas");
     this.ctx = this.c.getContext("2d");
     this.gradient = this.ctx.createLinearGradient(0, 0, 0, this.c.height);
     this.gradient.addColorStop(1, 'springgreen');
@@ -1387,8 +1396,8 @@ export class audioJS { //Heavily modified from: https://codepen.io/jackfuchs/pen
 
     this.audio = null;
 
-    this.info = document.getElementById('fileinfo').innerHTML; //this used to upgrade the UI information
-    this.menu = document.getElementById(this.audmenuId);
+    this.info = elm('fileinfo').innerHTML; //this used to upgrade the UI information
+    this.menu = elm(this.audmenuId);
     this.infoUpdateId = null; //to sotore the setTimeout ID and clear the interval
     this.animationId = null;
     this.status = 0; //flag for sound is playing 1 or stopped 0
@@ -1434,7 +1443,7 @@ export class audioJS { //Heavily modified from: https://codepen.io/jackfuchs/pen
       };
       this.updateInfo('Playing ' + this.fileName, false);
       this.info = 'Playing ' + this.fileName;
-      document.getElementById('fileWrapper').style.opacity = 0.2;
+      elm('fileWrapper').style.opacity = 0.2;
       this.draw();
   }
 
@@ -1456,44 +1465,44 @@ export class audioJS { //Heavily modified from: https://codepen.io/jackfuchs/pen
       
       HEGwebAPI.appendFragment(audiomenuHTML, parentId);
 
-      document.getElementById("useVol").onclick = () => {
+      elm("useVol").onclick = () => {
         if(this.useVol == false) {
           this.useVol = true;
-          document.getElementById("useVol").style.opacity = "1.0";
+          elm("useVol").style.opacity = "1.0";
         }
         else{
           this.useVol = false;
-          this.maxVol = document.getElementById("volSlider").value * 0.01;
-          if(this.audio.gain != null) {
+          this.maxVol = elm("volSlider").value * 0.01;
+          if(this.audio.gain !== null) {
             this.audio.gain.gain.setValueAtTime(this.maxVol, this.audio.ctx.currentTime);
           }
-          document.getElementById("useVol").style.opacity = "0.3";
+          elm("useVol").style.opacity = "0.3";
         }
       }
 
-      document.getElementById("volSlider").oninput = () => {
-        this.maxVol = document.getElementById("volSlider").value * 0.01;
-        if(this.audio.gain != null) {
+      elm("volSlider").oninput = () => {
+        this.maxVol = elm("volSlider").value * 0.01;
+        if(this.audio.gain !== null) {
           this.audio.gain.gain.setValueAtTime(this.maxVol, this.audio.ctx.currentTime);
         }
       }
 
-      document.getElementById("modebutton").onclick = () => {
+      elm("modebutton").onclick = () => {
         if(this.mode == 0) { this.mode = 1;}
         else if (this.mode == 1){this.mode = 2;}
         else{ this.mode = 0; }
       }
 
-      document.getElementById("showhide").onclick = () => {
+      elm("showhide").onclick = () => {
         if(this.hidden == false) {
           this.hidden = true;
-          document.getElementById("showhide").innerHTML = "Show UI";
-          document.getElementById(this.audmenuId).style.display = "none";
+          elm("showhide").innerHTML = "Show UI";
+          elm(this.audmenuId).style.display = "none";
         }
         else{
           this.hidden = false;
-          document.getElementById("showhide").innerHTML = "Hide UI";
-          document.getElementById(this.audmenuId).style.display = "";
+          elm("showhide").innerHTML = "Hide UI";
+          elm(this.audmenuId).style.display = "";
         }
       }
   }
@@ -1535,7 +1544,7 @@ export class audioJS { //Heavily modified from: https://codepen.io/jackfuchs/pen
         newVol = 0;
       }
       if(this.defaultUI == true) {
-        document.getElementById("volSlider").value = newVol * 100;
+        elm("volSlider").value = newVol * 100;
       }
       this.audio.gain.gain.value = newVol;
     }
@@ -1549,14 +1558,14 @@ export class audioJS { //Heavily modified from: https://codepen.io/jackfuchs/pen
     };
     this.status = 0;
     var text = 'Song ended...';
-    document.getElementById('fileWrapper').style.opacity = 1;
-    document.getElementById('fileinfo').innerHTML = text;
+    elm('fileWrapper').style.opacity = 1;
+    elm('fileinfo').innerHTML = text;
     this.info = text;
-    document.getElementById('uploadedFile').value = '';
+    elm('uploadedFile').value = '';
   }
 
   updateInfo(text, processing) {
-    var infoBar = document.getElementById('fileinfo'),
+    var infoBar = elm('fileinfo'),
     dots = '...',
     i = 0;
     infoBar.innerHTML = text + dots.substring(0, i++);
@@ -1578,8 +1587,8 @@ export class audioJS { //Heavily modified from: https://codepen.io/jackfuchs/pen
 
   init(){
 
-      var audioInput = document.getElementById('uploadedFile');
-      var dropContainer = document.getElementById(this.audioId+"canvas");
+      var audioInput = elm('uploadedFile');
+      var dropContainer = elm(this.audioId+"canvas");
       //listen the file upload
       audioInput.onchange = () => {
         this.audio = new SoundJS();
@@ -1594,7 +1603,7 @@ export class audioJS { //Heavily modified from: https://codepen.io/jackfuchs/pen
                 //the sound is still playing but we uploaded another file, so set the forceStop flag to true
                 this.forceStop = true;
             };
-            document.getElementById('fileWrapper').style.opacity = 1;
+            elm('fileWrapper').style.opacity = 1;
             this.updateInfo('Uploading', true);
             //once the file is ready, start the visualizer
             this.decodeAudio();
@@ -1602,7 +1611,7 @@ export class audioJS { //Heavily modified from: https://codepen.io/jackfuchs/pen
       };
       //listen the drag & drop
       dropContainer.addEventListener("dragenter", () => {
-          document.getElementById('fileWrapper').style.opacity = 1;
+          elm('fileWrapper').style.opacity = 1;
           this.updateInfo('Drop it on the page', true);
       }, false);
       dropContainer.addEventListener("dragover", function(e) {
@@ -1612,19 +1621,19 @@ export class audioJS { //Heavily modified from: https://codepen.io/jackfuchs/pen
           e.dataTransfer.dropEffect = 'copy';
       }, false);
       dropContainer.addEventListener("dragleave", () => {
-          document.getElementById('fileWrapper').style.opacity = 0.2;
+          elm('fileWrapper').style.opacity = 0.2;
           this.updateInfo(this.info, false);
       }, false);
       dropContainer.addEventListener("drop", (e) => {
           e.stopPropagation();
           e.preventDefault();
           if (this.audio.ctx===null) {return;};
-          document.getElementById('fileWrapper').style.opacity = 1;
+          elm('fileWrapper').style.opacity = 1;
           this.updateInfo('Uploading', true);
           //get the dropped file
           this.file = e.dataTransfer.files[0];
           if (this.status === 1) {
-              document.getElementById('fileWrapper').style.opacity = 1;
+              elm('fileWrapper').style.opacity = 1;
               this.forceStop = true;
           };
           this.fileName = this.file.name;
@@ -1822,10 +1831,10 @@ export class hillJS {
    
    if(defaultUI == true){
     this.initUI(parentId);
-    this.menu = document.getElementById(this.canvasmenuId);
+    this.menu = elm(this.canvasmenuId);
    }
    
-   this.c = document.getElementById(this.canvasId);
+   this.c = elm(this.canvasId);
    this.ctx = this.c.getContext("2d");
    this.hidden = false;
 
@@ -1862,7 +1871,7 @@ export class hillJS {
   }
 
   cancelDraw() {
-    if(this.animationId != null){
+    if(this.animationId !== null){
       cancelAnimationFrame(this.animationId);
       this.animationId = null;
     }
@@ -1882,57 +1891,57 @@ export class hillJS {
       
     HEGwebAPI.appendFragment(menuHTML,parentId);
 
-    document.getElementById("hillsAudbutton").style.opacity = 0.3;
+    elm("hillsAudbutton").style.opacity = 0.3;
 
-    document.getElementById("hillsRbutton").onclick = () => {
+    elm("hillsRbutton").onclick = () => {
       this.hillScore = [...Array(this.hillNum).fill(50)];
     }
-    document.getElementById("hillsModebutton").onclick = () => {
+    elm("hillsModebutton").onclick = () => {
       if(this.mode == 0) { this.mode = 1;}
       else{this.mode = 0;}
     }
-    document.getElementById("hillsAudbutton").onclick = () => {
+    elm("hillsAudbutton").onclick = () => {
       if(this.soundFX == null){
         this.soundFX = new SoundJS(); //Init on gesture
-        document.getElementById("hillsAudbutton").style.opacity = 1.0;
+        elm("hillsAudbutton").style.opacity = 1.0;
       }
       else{
         if(this.soundFX.gain.gain.value == 0){
           this.soundFX.gain.gain.value = 1;
-          document.getElementById("hillsAudbutton").style.opacity = 1.0;
+          elm("hillsAudbutton").style.opacity = 1.0;
         }
         else {
           this.soundFX.gain.gain.value = 0;
-          document.getElementById("hillsAudbutton").style.opacity = 0.3;
+          elm("hillsAudbutton").style.opacity = 0.3;
         }
       }
     }
-    document.getElementById("hillsSpeedbutton").onclick = () => {
-      this.updateInterval = document.getElementById("speed").value*1000;
+    elm("hillsSpeedbutton").onclick = () => {
+      this.updateInterval = elm("speed").value*1000;
     }
 
-    document.getElementById("startbutton").addEventListener('click',  this.draw, false);
-    document.getElementById("stopbutton").addEventListener('click',  this.cancelDraw, false);
+    elm("startbutton").addEventListener('click',  this.draw, false);
+    elm("stopbutton").addEventListener('click',  this.cancelDraw, false);
 
-    document.getElementById("showhide").onclick = () => {
+    elm("showhide").onclick = () => {
       if(this.hidden == false) {
         this.hidden = true;
-        document.getElementById("showhide").innerHTML = "Show UI";
-        document.getElementById(this.canvasmenuId).style.display = "none";
+        elm("showhide").innerHTML = "Show UI";
+        elm(this.canvasmenuId).style.display = "none";
       }
       else{
         this.hidden = false;
-        document.getElementById("showhide").innerHTML = "Hide UI";
-        document.getElementById(this.canvasmenuId).style.display = "";
+        elm("showhide").innerHTML = "Hide UI";
+        elm(this.canvasmenuId).style.display = "";
       }
     }
   }
 
   deInit(){
-    document.getElementById("startbutton").removeEventListener('click', this.draw);
-    document.getElementById("stopbutton").removeEventListener('click', this.cancelDraw);
-    if(this.soundFX != null){
-      if(this.soundFX.osc[0] != undefined) {
+    elm("startbutton").removeEventListener('click', this.draw);
+    elm("stopbutton").removeEventListener('click', this.cancelDraw);
+    if(this.soundFX !== null){
+      if(this.soundFX.osc[0] !== undefined) {
         this.soundFX.osc[0].stop(0);
       }
     }
@@ -1962,7 +1971,7 @@ export class hillJS {
     // Create background and bars
     // Change height of bars based on avg or rms. (all at 0 on fresh session)
     // Update last bar for every t time interval based on change
-    if(this.soundFX != null){
+    if(this.soundFX !== null){
       if(this.hillScore[this.hillScore.length - 1] > this.hillScore[this.hillScore.length - 2]) {
         this.soundFX.playFreq([650+this.hillScore[this.hillScore.length - 1]], 0.05);
       }
@@ -2046,7 +2055,7 @@ export class textReaderJS {
       this.initUI();
     }
 
-    this.c = document.getElementById(this.canvasId);
+    this.c = elm(this.canvasId);
     this.ctx = this.c.getContext("2d");
     this.pxf = 0.5; //Pixels per frame;
     this.lastpxf = this.pxf; //Store last pxf when paused or whatever
@@ -2073,32 +2082,32 @@ export class textReaderJS {
 
     HEGwebAPI.appendFragment(uiHTML, this.parentId);
 
-    document.getElementById(this.canvasId+'submittext').onclick = () => {
-      this.text = document.getElementById(this.textId+'Textarea').value;
+    elm(this.canvasId+'submittext').onclick = () => {
+      this.text = elm(this.textId+'Textarea').value;
       this.textXPos = 0;
     }
 
-    document.getElementById("showhide").onclick = () => {
+    elm("showhide").onclick = () => {
       if(this.hidden == false) {
         this.hidden = true;
-        document.getElementById("showhide").innerHTML = "Show UI";
-        document.getElementById(this.canvasId+'menu').style.display = "none";
+        elm("showhide").innerHTML = "Show UI";
+        elm(this.canvasId+'menu').style.display = "none";
       }
       else{
         this.hidden = false;
-        document.getElementById("showhide").innerHTML = "Hide UI";
-        document.getElementById(this.canvasId+'menu').style.display = "";
+        elm("showhide").innerHTML = "Hide UI";
+        elm(this.canvasId+'menu').style.display = "";
       }
     }
 
-    document.getElementById("startbutton").addEventListener('click', this.startpxf, false);
-    document.getElementById("stopbutton").addEventListener('click', this.stoppxf, false);
+    elm("startbutton").addEventListener('click', this.startpxf, false);
+    elm("stopbutton").addEventListener('click', this.stoppxf, false);
 
   }
 
   deInit(){
-    document.getElementById("startbutton").removeEventListener('click', this.startpxf);
-    document.getElementById("stopbutton").removeEventListener('click', this.stoppxf);
+    elm("startbutton").removeEventListener('click', this.startpxf);
+    elm("stopbutton").removeEventListener('click', this.stoppxf);
   }
 
   onData(score) {
@@ -2289,7 +2298,7 @@ export class boidsJS { //Birdoids Swarm AI. https://en.wikipedia.org/wiki/Boids
 
   draw = () => {
     var success = this.calcBoids();
-    if(success == true){
+    if(success === true){
           //Moving anchor
       var anchorTick = performance.now()*0.00005;
       var newAnchor = [Math.sin(anchorTick)*Math.sin(anchorTick)*this.renderer.canvas.width*0.3+this.renderer.canvas.width*0.2, this.renderer.canvas.height*0.3, 0];
@@ -2315,7 +2324,7 @@ export class boidsJS { //Birdoids Swarm AI. https://en.wikipedia.org/wiki/Boids
 
     //Now feed the position data into the visual as a list of vec3 data or update canvas
 
-    setTimeout(()=>{this.animationId = requestAnimationFrame(this.draw)},20);
+    setTimeout(() => this.animationId = requestAnimationFrame(this.draw), 20);
   }
 
 }
@@ -2334,7 +2343,7 @@ export class Particles { //Adapted from this great tutorial: https://modernweb.c
 
       HEGwebAPI.appendFragment(canvasHTML, this.parentId);
      
-      this.canvas = document.getElementById(this.canvasId);
+      this.canvas = elm(this.canvasId);
       this.context = this.canvas.getContext("2d");
 
       this.animationId = null;
@@ -2353,20 +2362,20 @@ export class Particles { //Adapted from this great tutorial: https://modernweb.c
       this.particles = [];
       this.particleIndex = 0;
       this.settings = {
-            maxParticles: maxParticles,
-            particleSize: 5,
-            startingX: this.canvas.width / 2, 
-            startingY: this.canvas.height / 4,
-            maxSpeed: 3, 
-            xBounce: -1,
-            yBounce: -1,
-            gravity: 0.0,
-            maxLife: Infinity,
-            groundLevel: this.canvas.height * 0.999,
-            leftWall: this.canvas.width * 0.001,
-            rightWall: this.canvas.width * 0.999,
-            ceilingWall: this.canvas.height * 0.001
-          };
+        maxParticles: maxParticles,
+        particleSize: 5,
+        startingX: this.canvas.width / 2, 
+        startingY: this.canvas.height / 4,
+        maxSpeed: 3, 
+        xBounce: -1,
+        yBounce: -1,
+        gravity: 0.0,
+        maxLife: Infinity,
+        groundLevel: this.canvas.height * 0.999,
+        leftWall: this.canvas.width * 0.001,
+        rightWall: this.canvas.width * 0.999,
+        ceilingWall: this.canvas.height * 0.001
+      };
 
       //for default anim
       // To optimise the previous script, generate some pseudo-random angles
@@ -2374,12 +2383,11 @@ export class Particles { //Adapted from this great tutorial: https://modernweb.c
       this.seedsY = [];
       this.currentAngle = 0;
 
-      if(this.useDefaultAnim == true){
+      if(this.useDefaultAnim == true) {
         this.seedAngles();     // Start off with 100 angles ready to go
       }
 
-      this.animationId = requestAnimationFrame(this.draw);
-      
+      this.animationId = requestAnimationFrame(this.draw); 
     }
 
     seedAngles() {
@@ -2545,7 +2553,7 @@ export class BufferLoader { //From HTML5 Rocks tutorial
     request.responseType = "arraybuffer";
     var responseBuf = null;
     
-    if((url.indexOf("http://") != -1) || (url.indexOf("file://") != -1)){
+    if((url.indexOf("http://") !== -1) || (url.indexOf("file://") !== -1)){
         request.open("GET", url, true);
         request.onreadystatechange = () => {
           if(request.readyState === 4){
@@ -2709,7 +2717,7 @@ export class SoundJS { //Only one Audio context at a time!
     }
     
     this.sourceList[bufferIndex].start(startTime);
-    if(seconds != 0){
+    if(seconds !== 0){
       this.sourceList[bufferIndex].stop(startTime+seconds);
     }
   }
@@ -2727,7 +2735,7 @@ export class SoundJS { //Only one Audio context at a time!
     navigator.mediaDevices.enumerateDevices().then((devices) => {
       devices = devices.filter((d) => d.kind === 'audioinput');
       devices.forEach(function(device) {
-        let menu = document.getElementById("inputdevices");
+        let menu = elm("inputdevices");
         if (device.kind == "audioinput") {
           let item = document.createElement("option");
           item.innerHTML = device.label;
@@ -2753,8 +2761,8 @@ export class SoundJS { //Only one Audio context at a time!
     var supported = null;
     var ext = null;
     var types = type;
-    if(types==null){
-      if(args.video != false){
+    if (types === null) {
+      if (args.video !== false) {
         types = [
           'video/webm',
           'video/webm;codecs=vp8',
@@ -2772,8 +2780,7 @@ export class SoundJS { //Only one Audio context at a time!
           'video/webm;codecs=h264,vp9,opus',
           'video/x-matroska;codecs=avc1'
         ];
-        }
-      else if(args.audio == true){
+      } else if (args.audio == true) {
         types = [
           'audio/wav', // might be supported native, otherwise see:
           'audio/mp3', // probably not supported
@@ -2786,30 +2793,30 @@ export class SoundJS { //Only one Audio context at a time!
       }
     }
 
-    for(var i=0; i<types.length; i++){
+    for (var i=0; i<types.length; i++) {
       if(MediaRecorder.isTypeSupported(types[i]) == true){
         supported = types[i];
         console.log("Supported type: ", supported);
-        if(types[i].indexOf('webm') != -1){
+        if(types[i].indexOf('webm') !== -1){
           ext = '.webm';
         }
-        if(types[i].indexOf('ogg') != -1){
+        if(types[i].indexOf('ogg') !== -1){
           ext = '.ogg';
         }
-        if(types[i].indexOf('mp3') != -1){
+        if(types[i].indexOf('mp3') !== -1){
           ext = '.mp3';
         }
-        if(types[i].indexOf('wav') != -1){
+        if(types[i].indexOf('wav') !== -1){
           ext = '.wav';
         }
-        if(types[i].indexOf('x-matroska') != -1){
+        if(types[i].indexOf('x-matroska') !== -1){
           ext = '.mkv';
         }
         break;
       }
     }
 
-    if(supported != null){
+    if (supported !== null) {
       function errfunc(e) {
         console.log(e);
       } 
@@ -2817,7 +2824,7 @@ export class SoundJS { //Only one Audio context at a time!
       navigator.mediaDevices.getUserMedia(args).then((recordingDevice) => { //Get
         console.log("Media stream created.");
         
-        if(streamElement != null){ // attach to audio or video element, or Audio(). For canvas, use an AudioContext analyzer.
+        if(streamElement !== null){ // attach to audio or video element, or Audio(). For canvas, use an AudioContext analyzer.
           streamElement.src = window.URL.createObjectURL(recordingDevice);
         }
 
@@ -2864,212 +2871,23 @@ export class SoundJS { //Only one Audio context at a time!
 }
  
 export class geolocateJS {
-    constructor(){
-      if(navigator.geolocation){
+    constructor() {
+      if(navigator.geolocation) {
         
-      }
-      else{
+      } else {
         alert("Geolocation not supported in this browser!");
       }
 
-      this.locationData=[];
+      this.locationData = [];
     }
 
-    showPosition(position){
-      //alert("Lat: "+position.coords.latitude+", Lon: "+position.coords.longitude);
-      this.locationData.push(new Date().toISOString()+","+position.coords.latitude+","+position.coords.longitude);
+    showPosition(position) {
+      // alert("Lat: "+position.coords.latitude+", Lon: "+position.coords.longitude);
+      this.locationData.push(new Date().toISOString() + "," + position.coords.latitude + "," + position.coords.longitude);
     }
 
-    getPosition(){
+    getPosition() {
       navigator.geolocation.getCurrentPosition(this.showPosition);
     }
 
-}
-
-export class bleUtils { //This is formatted for the way the HEG sends/receives information. Other BLE devices will likely need changes to this to be interactive.
-   constructor(async = false, serviceUUID = '6e400001-b5a3-f393-e0a9-e50e24dcca9e', rxUUID = '6e400002-b5a3-f393-e0a9-e50e24dcca9e', txUUID = '6e400003-b5a3-f393-e0a9-e50e24dcca9e', defaultUI = true, parentId="main_body" , buttonId = "blebutton"){
-    this.serviceUUID = serviceUUID;
-    this.rxUUID      = rxUUID; //characteristic that can receive input from this device
-    this.txUUID      = txUUID; //characteristic that can transmit input to this device
-    this.encoder     = new TextEncoder("utf-8");
-    this.decoder     = new TextDecoder("utf-8");
-
-    this.device  = null;
-    this.server  = null;
-    this.service = null;
-    this.rxchar  = null; //receiver on the BLE device (write to this)
-    this.txchar  = null; //transmitter on the BLE device (read from this)
-
-    this.parentId = parentId;
-    this.buttonId = buttonId;
-
-    this.async = async;
-
-    this.android = navigator.userAgent.toLowerCase().indexOf("android") > -1; //Use fast mode on android (lower MTU throughput)
-
-    this.n; //nsamples
-
-    if(defaultUI = true){
-      this.initUI(parentId, buttonId);
-    }
-    
-   }
-
-   initUI(parentId, buttonId) {
-    if(this.device != null){
-      if (this.device.gatt.connected) {
-        this.device.gatt.disconnect();
-        console.log("device disconnected")
-      }
-    }
-    var HTMLtoAppend = '<button id="'+buttonId+'">BLE Connect</button>';
-    HEGwebAPI.appendFragment(HTMLtoAppend,parentId);
-    document.getElementById(buttonId).onclick = () => { 
-      if(this.async === false) {
-        this.initBLE();
-      } 
-      else{
-        this.initBLEasync();
-      } 
-    }
-   }
-
-   //Typical web BLE calls
-   initBLE = (serviceUUID = this.serviceUUID, rxUUID = this.rxUUID, txUUID = this.txUUID) => { //Must be run by button press or user-initiated call
-    navigator.bluetooth.requestDevice({   
-      acceptAllDevices: true,
-      optionalServices: [serviceUUID] 
-      })
-      .then(device => {
-          //document.getElementById("device").innerHTML += device.name+ "/"+ device.id +"/"+ device.gatt.connected+"<br>";
-          this.device = device;
-          return device.gatt.connect(); //Connect to HEG
-      })
-      .then(sleeper(100)).then(server => server.getPrimaryService(serviceUUID))
-      .then(sleeper(100)).then(service => { 
-        this.service = service;
-        service.getCharacteristic(rxUUID).then(sleeper(100)).then(tx => {
-          this.rxchar = tx;
-          return tx.writeValue(this.encoder.encode("t")); // Send command to start HEG automatically (if not already started)
-        });
-        if(this.android == true){
-          service.getCharacteristic(rxUUID).then(sleeper(1000)).then(tx => {
-            return tx.writeValue(this.encoder.encode("o")); // Fast output mode for android
-          });
-        }
-        return service.getCharacteristic(txUUID) // Get stream source
-      })
-      .then(sleeper(1100)).then(characteristic=>{
-          this.txchar = characteristic;
-          return characteristic.startNotifications(); // Subscribe to stream
-      })
-      .then(sleeper(100)).then(characteristic => {
-          characteristic.addEventListener('characteristicvaluechanged',
-                                          this.onNotificationCallback) //Update page with each notification
-      }).then(sleeper(100)).then(this.onConnectedCallback())
-      .catch(err => {console.error(err);});
-      
-      function sleeper(ms) {
-          return function(x) {
-              return new Promise(resolve => setTimeout(() => resolve(x), ms));
-          };
-      }
-   }
-
-   onNotificationCallback = (e) => { //Customize this with the UI (e.g. have it call the handleScore function)
-     var val = this.decoder.decode(e.target.value);
-     console.log("BLE MSG: ",val);
-   }
-
-
-   onConnectedCallback = () => {
-      //Use this to set up the front end UI once connected here
-   }
-
-   sendMessage = (msg) => {
-     this.rxchar.writeValue(this.encoder.encode(msg));
-   }
-
-   //Async solution fix for slower devices (android). This is slower than the other method on PC. Credit Dovydas Stirpeika
-   async connectAsync() {
-        this.device = await navigator.bluetooth.requestDevice({
-            filters: [{ namePrefix: 'HEG' }],
-            optionalServices: [this.serviceUUID]
-        });
-
-        console.log("BLE Device: ", this.device);
-        
-        const btServer = await this.device.gatt?.connect();
-        if (!btServer) throw 'no connection';
-        this.device.addEventListener('gattserverdisconnected', onDisconnected);
-        
-        this.server = btServer;
-        
-        const service = await this.server.getPrimaryService(this.serviceUUID);
-        
-        // Send command to start HEG automatically (if not already started)
-        const tx = await service.getCharacteristic(this.rxUUID);
-        await tx.writeValue(this.encoder.encode("t"));
-
-        if(this.android == true){
-          await tx.writeValue(this.encoder.encode("o"));
-        }
-        
-        this.characteristic = await service.getCharacteristic(this.txUUID);
-         this.onConnectedCallback();
-        return true;
-    }
-
-    disconnect = () => this.server?.disconnect();
-
-    onDisconnected = () => {
-      console.log("BLE device disconnected!");
-    }
-
-    async readDeviceAsync () {
-        if (!this.characteristic) {
-            console.log("HEG not connected");
-            throw "error";
-        }
-
-        // await this.characteristic.startNotifications();
-        this.doReadHeg = true;
-        
-        var data = ""
-        while (this.doReadHeg) {
-            const val = this.decoder.decode(await this.characteristic.readValue());
-            if (val !== this.data) {
-                data = val;
-                console.log(data);
-                //data = data[data.length - 1];
-                //const arr = data.replace(/[\n\r]+/g, '')
-                this.n += 1;
-                this.onReadAsyncCallback(data);
-            }
-        }
-    }
-
-    onReadAsyncCallback = (data) => {
-      console.log("BLE Data: ",data)
-    }
-
-    stopReadAsync = () => {
-        this.doReadHeg = false;
-        tx.writeValue(this.encoder.encode("f"));
-    }
-
-    spsinterval = () => {
-      setTimeout(() => {
-        console.log("SPS", this.n + '');
-        this.n = 0;
-        this.spsinterval();
-      }, 1000);
-    }
-
-    async initBLEasync() {
-      await this.connectAsync();
-      this.readDeviceasync();
-      this.spsinterval();
-    }
-      
 }

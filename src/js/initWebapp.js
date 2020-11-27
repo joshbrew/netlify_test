@@ -3,9 +3,12 @@ import { graphNode, ThreeGlobe } from './threeApp'
 //import { nodeSerial } from './nodeserialUtils'
 import { webSerial } from './webserialUtils'
 import { ChromaticAberrationEffect } from 'postprocessing';
+import { elm } from '../util/util';
+import { HegConnection } from './heg-connection';
 // Custom Scripts and UI setup, feedback modules must be manually linked to session event data (you can mix and match or write your own easily) 
 // Advanced Client scripts using external packages
 
+const decoder = new TextDecoder("utf-8");
  
 // Initialize Session - undefined are default values
 var s = new HEGwebAPI('',undefined,undefined,undefined,undefined,false); //HEGduino
@@ -65,13 +68,13 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
   HEGwebAPI.appendFragment(connectHTML, "main_body");
   
   function attachModalListeners(modalElm, closemodal, overlay) {
-    document.getElementById(closemodal).onclick = function() {toggleModal(modalElm, closemodal, overlay)};
-    document.getElementById(overlay).onclick = function() {toggleModal(modalElm, closemodal, overlay)};
+    elm(closemodal).onclick = () => toggleModal(modalElm, closemodal, overlay);
+    elm(overlay).onclick = () => toggleModal(modalElm, closemodal, overlay);
   }
   
   function detachModalListeners(modalElm, closemodal, overlay) {
-    document.getElementById(closemodal).onclick = function() {toggleModal(modalElm, closemodal, overlay)};
-    document.getElementById(overlay).onclick = function() {toggleModal(modalelm, closemodal, overlay)};
+    elm(closemodal).onclick = () => toggleModal(modalElm, closemodal, overlay);
+    elm(overlay).onclick = () => toggleModal(modalelm, closemodal, overlay);
   }
   
   function toggleModal(modalElm, closemodal, overlay) {
@@ -88,38 +91,36 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
     }
   }
   
-  var modal = document.getElementById('modal');
-  var modal2 = document.getElementById('modal2');
-  var modal3 = document.getElementById('modal3');
+  var modal = elm('modal');
+  var modal2 = elm('modal2');
+  var modal3 = elm('modal3');
   
-  document.getElementById('modal_opener').onclick = function() {
-    toggleModal(modal,'close_modal','overlay')
+  elm('modal_opener').onclick = () => {
+    toggleModal(modal,'close_modal','overlay');
     this.modal2.style.display = 'none';
     this.modal3.style.display = 'none';
   };
-  document.getElementById('modal_opener2').onclick = function() {
-    toggleModal(modal2,'close_modal2','overlay2')
+  elm('modal_opener2').onclick = () => {
+    toggleModal(modal2,'close_modal2','overlay2');
     this.modal.style.display = 'none';
     this.modal3.style.display = 'none';
   };
-  document.getElementById('modal_opener3').onclick = function() {
-    toggleModal(modal3,'close_modal3','overlay3')
+  elm('modal_opener3').onclick = () => {
+    toggleModal(modal3,'close_modal3','overlay3');
     this.modal.style.display = 'none';
   };
   
   function toggleHEG(switchElement) {
     if (switchElement.checked) {
-      document.getElementById('startbutton').click();
+      elm('startbutton').click();
     } else {
-      document.getElementById('stopbutton').click();
+      elm('stopbutton').click();
     }
   }
 
-  document.getElementById("togBtn").onclick = function(){toggleHEG(document.getElementById("togBtn"))};
+  elm("togBtn").onclick = () => toggleHEG(elm("togBtn"));
 
-  document.getElementById("wifibutton").onclick = () => {
-    document.getElementById("submithost").click();
-  }
+  elm("wifibutton").onclick = () => elm("submithost").click();
 
   // ------------------------------------------------------------------------
   // ------------------------------------------------------------------------
@@ -154,43 +155,43 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
 
   HEGwebAPI.appendFragment(modeHTML,"visualBox");
   
-  document.getElementById("canvasmode").onclick = function() {
-    if(c == null){
+  elm("canvasmode").onclick = () => {
+    if(c === null){
       deInitMode();
       c = new circleJS();
     }
   }
   
-  document.getElementById("videomode").onclick = function() {
-    if(v == null){
+  elm("videomode").onclick = () => {
+    if(v === null){
       deInitMode();
       v = new videoJS();
     }
   }
   
-  document.getElementById("audiomode").onclick = function() {
-    if(a == null){
+  elm("audiomode").onclick = () => {
+    if(a === null){
       deInitMode();
       a = new audioJS();
     }
   }
   
-  document.getElementById("hillmode").onclick = function() {
-    if(h == null){
+  elm("hillmode").onclick = () => {
+    if(h === null){
       deInitMode();
       h = new hillJS();
     }
   }
   
-  document.getElementById("txtmode").onclick = function() {
-    if(txt == null){
+  elm("txtmode").onclick = () => {
+    if(txt === null){
       deInitMode();
       txt = new textReaderJS();
     }
   }
 
-  document.getElementById("boidsmode").onclick = function() {
-    if(boids == null){
+  elm("boidsmode").onclick = () => {
+    if(boids === null){
       deInitMode();
       boids = new boidsJS();
     }
@@ -199,7 +200,7 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
   // ------------------------------------------------------------------------
   // ------------------------------------------------------------------------
   
-  if(useAdvanced) { // Setup advanced scripts now that the default app is ready.
+  if (useAdvanced) { // Setup advanced scripts now that the default app is ready.
     var link = document.createElement("script");
     link.src = "js/threeApp.js"; // Can set this to be a nonlocal link like from cloudflare or a special script with a custom app
     document.head.appendChild(link); // Append script
@@ -209,8 +210,8 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
     var threeModeHTML = '<button class="button" id="threemode">Sunrise</button>';
     HEGwebAPI.appendFragment(threeModeHTML,"menudiv");
   
-    document.getElementById("threemode").onclick = function() {
-      if(threeApp == null) {
+    elm("threemode").onclick = () => {
+      if(threeApp === null) {
           deInitMode();
           threeApp = new ThreeGlobe();
       }
@@ -228,8 +229,8 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
   s.handleScore = function() {
     g.clock = this.clock[this.clock.length - 1] - this.startTime;
     if(this.ratio.length > 40){
-      if(g.sampleRate == null) {
-        if(s.useMs == true){ g.sampleRate = (this.clock[this.clock.length - 1] - this.clock[0]) * 0.001 / this.clock.length; } // Seconds / Sample
+      if(g.sampleRate === null) {
+        if(s.useMs === true){ g.sampleRate = (this.clock[this.clock.length - 1] - this.clock[0]) * 0.001 / this.clock.length; } // Seconds / Sample
         else{ g.sampleRate = (this.clock[this.clock.length - 1] - this.clock[0]) * 0.000001 / this.clock.length; } // Seconds / Sample
       }
       this.smaScore(this.ratio);
@@ -273,14 +274,12 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
     }
   }
   
-  s.endOfEvent = function() {
-    if(suppressTog !== true){
-      if(document.getElementById("togBtn").checked == false){
-        document.getElementById("togBtn").checked = true;
-      }
+  s.endOfEvent = () => {
+    if (suppressTog !== true && elm("togBtn").checked === false) {
+        elm("togBtn").checked = true;
     }
-    if(g.xoffsetSlider.max < this.scoreArr.length){
-      if(this.scoreArr.length % 20 == 0) { 
+    if (g.xoffsetSlider.max < this.scoreArr.length) {
+      if(this.scoreArr.length % 20 === 0) {
         g.xoffsetSlider.max = this.scoreArr.length - 3; // Need 2 vertices minimum
       }
     }
@@ -332,7 +331,7 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
   }
   
 
-  document.getElementById("resetSession").onclick = () => { // Override default function
+  elm("resetSession").onclick = () => { // Override default function
     s.resetVars();
     g.resetVars();
   
@@ -383,7 +382,7 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
      else if (s.scoreArr.length < g.graphY1.length) { // less data than graph size, generate zeroes with data from 0 to offset
       var scoreslice = s.scoreArr.slice(0,s.scoreArr.length - 1 - g.xoffset);
       var ratioslice = s.ratio.slice(0,s.ratio.length - 1 - g.xoffset);
-      if(g.graphY1.length == scoreslice){
+      if(g.graphY1.length === scoreslice){
         g.graphY1 = scoreslice;
         g.graphY2 = ratioslice;
       }
@@ -417,7 +416,7 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
     g.VERTEX_LENGTH = g.graphY1.length;
   }
   
-  document.getElementById("xscalebutton").onclick = () => {
+  elm("xscalebutton").onclick = () => {
     var len = g.graphY1.length;
     g.xscaleSlider.value = g.nPoints;
     if(g.xscaleSlider.value < len) { // Remove from front.
@@ -441,10 +440,10 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
     g.VERTEX_LENGTH = g.xscaleSlider.value;
   }
   
-  document.getElementById("xscaletd").style.display = "none"; // Gonna leave this out for now.
-  document.getElementById("xscalebutton").style.display = "none"; // Gonna leave this out for now.
-  document.getElementById("xoffsettd").style.display = "none"; // Gonna leave this out for now.
-  document.getElementById("xoffsetbutton").style.display = "none"; // Gonna leave this out for now.
+  elm("xscaletd").style.display = "none"; // Gonna leave this out for now.
+  elm("xscalebutton").style.display = "none"; // Gonna leave this out for now.
+  elm("xoffsettd").style.display = "none"; // Gonna leave this out for now.
+  elm("xoffsetbutton").style.display = "none"; // Gonna leave this out for now.
   
   // ------------------------------------------------------------------------
   // ----------------------------ToolTips------------------------------------
@@ -453,9 +452,9 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
   function makeTooltip(parentId, position=[100,100], text="Tooltip text") {
     var tooltipHTML = "<div id='"+parentId+"_tooltip' class='tooltip'></div>";
     HEGwebAPI.appendFragment(tooltipHTML, parentId);
-    var tooltip = document.getElementById(parentId+"_tooltip");
+    var tooltip = elm(parentId+"_tooltip");
     tooltip.innerHTML = text;
-    var thisParent = document.getElementById(parentId);
+    var thisParent = elm(parentId);
     
     // console.log(tooltip);
     tooltip.style.left = position[0] + "px";
@@ -500,77 +499,40 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
   makeTooltip("hillmode",[300,10],"Climb the mountain!");
   makeTooltip("boidsmode",[300,10],"Make the boids swirl together!");
   
-  if(useAdvanced == true){
-    makeTooltip("threemode",[300,10],"Turn the Earth! More coming!");
-  }
+  if (useAdvanced === true) makeTooltip("threemode",[300,10],"Turn the Earth! More coming!");
 
-  makeTooltip("wifibutton",[-150,40],"Connect to a device via WiFi, make sure you are connected to its local server or enter its IP in the Data menu if it's on a host network.")
+  makeTooltip("wifibutton",[-150,40], "Connect to a device via WiFi, make sure you are connected to its local server or enter its IP in the Data menu if it's on a host network.")
 
 //------------------------------------------------------------------------
 //------------------------Bluetooth LE Additions--------------------------
 //------------------------------------------------------------------------
-if((window.location.hostname !== '192.168.4.1')) { //Will not work on an IP
+if (window.location.hostname !== '192.168.4.1') { // Will not work on an IP
 
-  var ble = new bleUtils(false);
-  makeTooltip("blebutton",[-150,40],"Connect to a device via Bluetooth LE!")
-
-  ble.onNotificationCallback = (e) => {
-
-    //console.log(e.target.readValue());
-    var line = ble.decoder.decode(e.target.value);
-    if(ble.android == true){
-      line = Date.now()+"|"+line;
-    }
+  const ble_ = new HegConnection((ev) => {
+    const dataView = ev.target.value;
+    const rawVal = decoder.decode(dataView);
     
-    //pass to data handler
-    if(line.split(s.delimiter).length == s.header.length) { //Most likely a data line based on our stream header formatting
-      s.handleEventData(line); 
-      //console.log("Passing BLE Data...", Date.now())
-    }
-    else {
-      console.log("BLE MSG: ", line);
-    }
-  }
+    s.handleEventData(Date.now() + "|" + rawVal)
+  });
 
-  ble.onReadAsyncCallback = (data) => {
-
-    var line = data;
-    if(ble.android == true){
-      line = Date.now()+"|"+line;
-    }
-
-    //pass to data handler
-    if(line.split(s.delimiter).length == s.header.length) { //Most likely a data line based on our stream header formatting
-      s.handleEventData(line); 
-      //console.log("Passing BLE Data...", Date.now())
-    }
-    else {
-      console.log("BLE MSG: ", line);
-    }
-  }
-
+  
   ble.onConnectedCallback = () => {
     
     s.removeEventListeners();
-    if(ble.android === true){
+
+    if (ble.android === true) {
       s.header=["ms","Red","IR","Ratio"];
       s.updateStreamHeader();
       s.useMs = true;
       g.usems = true;
     }
-    document.getElementById("startbutton").onclick = () => {
-      ble.sendMessage('t');
-    }
-    document.getElementById("stopbutton").onclick = () => {
-      ble.sendMessage('f');
-    }
-    document.getElementById("sendbutton").onclick = () => {
-      ble.sendMessage(document.getElementById('command').value);
-    }
+    elm("startbutton").onclick = () => ble.sendMessage('t');
+    elm("stopbutton").onclick = () => ble.sendMessage('f');
+    elm("sendbutton").onclick = () => ble.sendMessage(elm('command').value);
   }
 
   ble.onDisconnected = () => {
-    if(ble.android == true){
+    if(ble.android === true){
       s.header=["us","Red","IR","Ratio","Ambient","drdt","ddrdt"]; //try to reset the header in case of reconnecting through a different protocol
       s.updateStreamHeader();
       s.useMs = false;
@@ -603,14 +565,14 @@ if((window.location.hostname !== '192.168.4.1')) { //Will not work on an IP
   serialMonitor.finalCallback = () => { //Set this so USB devices bind to the interface once connected.
     s.removeEventListeners();
 
-    document.getElementById("startbutton").onclick = () => {
+    elm("startbutton").onclick = () => {
       serialMonitor.sendMessage('t');
     }
-    document.getElementById("stopbutton").onclick = () => {
+    elm("stopbutton").onclick = () => {
       serialMonitor.sendMessage('f');
     }
-    document.getElementById("sendbutton").onclick = () => {
-      serialMonitor.sendMessage(document.getElementById('command').value);
+    elm("sendbutton").onclick = () => {
+      serialMonitor.sendMessage(elm('command').value);
     }
 
     if(window.PEANUT){
@@ -624,7 +586,7 @@ if((window.location.hostname !== '192.168.4.1')) { //Will not work on an IP
     else{
       serialMonitor.onReadLine = (line) => { //Connect the serial monitor data to the session handler
         //pass to data handler
-        if(line.split(s.delimiter).length == s.header.length) { //Most likely a data line based on our stream header formatting
+        if(line.split(s.delimiter).length === s.header.length) { //Most likely a data line based on our stream header formatting
           s.handleEventData(line); 
           //console.log("Passing Serial Data...", Date.now())
         }
