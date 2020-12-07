@@ -7,7 +7,7 @@
   cursor: pointer;
   top: 40px;
   right: 120px;
-  min-width: 110px;
+  min-width: 120px;
   height: 34px;
   opacity: 0.3;
   background-color: black;
@@ -27,9 +27,9 @@
 #wifibutton {
   position: absolute;
   cursor: pointer;
-  min-width: 110px;
+  min-width: 120px;
   top: 40px;
-  right: 230px;
+  right: 240px;
   height: 34px;
   opacity: 0.3;
   background-color: black;

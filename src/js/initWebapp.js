@@ -622,9 +622,9 @@ if (navigator.userAgent.toLowerCase().indexOf("android") >= 0) {
   document.getElementById("blebutton").style.right = "";
   document.getElementById("switch").style.right = "";
 
-  document.getElementById("wifibutton").style.left = "500px";
-  document.getElementById("blebutton").style.left = "500px";
-  document.getElementById("switch").style.left = "620px";
+  document.getElementById("wifibutton").style.left = "470px";
+  document.getElementById("blebutton").style.left = "470px";
+  document.getElementById("switch").style.left = "600px";
   
   document.getElementById("wifibutton").style.top = "5px";
 
