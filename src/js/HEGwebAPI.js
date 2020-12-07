@@ -91,7 +91,7 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
 
       var fragment = document.createDocumentFragment();
       var newDiv = document.createElement('div');
-      newDiv.innerHTML = HTMLtoAppend;
+      newDiv.insertAdjacentHTML('afterbegin',HTMLtoAppend);
       newDiv.setAttribute("id", parentId + '_child');
 
       fragment.insertHTML(newDiv);
@@ -110,7 +110,7 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
 
       var fragment = document.createDocumentFragment();
       var newDiv = document.createElement('div');
-      newDiv.innerHTML = HTMLtoAppend;
+      newDiv.insertAdjacentHTML('afterbegin',HTMLtoAppend);
       newDiv.setAttribute("id", parentId + '_child');
 
       fragment.appendChild(newDiv);
