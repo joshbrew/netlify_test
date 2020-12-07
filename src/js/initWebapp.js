@@ -620,12 +620,18 @@ else if (navigator.userAgent.toLowerCase().indexOf("android") < 0) {
 if (navigator.userAgent.toLowerCase().indexOf("android") >= 0) {
   document.getElementById("wifibutton").style.right = "";
   document.getElementById("blebutton").style.right = "";
-  document.getElementById("refreshSerial").style.right = "";
   document.getElementById("switch").style.right = "";
 
-  document.getElementById("wifibutton").style.left = "480px";
-  document.getElementById("blebutton").style.left = "590px";
-  document.getElementById("refreshSerial").style.left = "300px";
-  document.getElementById("switch").style.left = "700px";
+  document.getElementById("wifibutton").style.left = "500px";
+  document.getElementById("blebutton").style.left = "500px";
+  document.getElementById("switch").style.left = "620px";
+  
+  document.getElementById("wifibutton").style.top = "5px";
+
+  [...document.styleSheets[0].cssRules].find(x=> x.selectorText=='.modal_content')
+    .style.left='12.5%';
+
+  [...document.styleSheets[0].cssRules].find(x=> x.selectorText=='.modal_content')
+  .style.transform='';
 
 }

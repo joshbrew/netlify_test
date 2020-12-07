@@ -428,7 +428,8 @@ h1 {
     .modal_content {
         z-index: 999;
         position: absolute;
-        left: 25%;
+        left: 50%;
+        transform: translateX(-50%);
         font-family:Arial, Helvetica, sans-serif;
         max-height: 420px;
         overflow: auto;
