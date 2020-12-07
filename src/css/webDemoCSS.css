@@ -64,11 +64,6 @@
   opacity: 1.0; 
 }
 
-
-body{
-  width: 100%;
-}
-
 h1 {
   font-family: Console, Lucida, monospace;
   height:20px;
@@ -165,6 +160,7 @@ h1 {
 .canvasContainer {
   position:absolute;
   width: 100%;
+  min-width: 700px;
   top: 89px;
   height: 500px;
   margin-left: auto;
@@ -549,6 +545,7 @@ input:checked + .startslider:after {
 /* Set height of body and the document to 100% */
 body, html {
     width:  100%;
+    min-width: 700px;
     height: 100%;
     margin: 0;
     background-color: black;
