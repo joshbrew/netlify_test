@@ -94,7 +94,7 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
       newDiv.innerHTML = HTMLtoAppend;
       newDiv.setAttribute("id", parentId + '_child');
 
-      fragment.appendChild(newDiv);
+      fragment.insertAdjacentHTML('beforeend',newDiv);
 
       elm(parentId).appendChild(fragment);
   }
@@ -113,7 +113,7 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
       newDiv.innerHTML = HTMLtoAppend;
       newDiv.setAttribute("id", parentId + '_child');
 
-      fragment.appendChild(newDiv);
+      fragment.insertAdjacentHTML('beforeend',newDiv);
 
       elm(parentId).appendChild(fragment);
   }
@@ -975,12 +975,12 @@ export class circleJS {
 
     elm("showhide").onclick = () => {
       if(this.hidden === false){
-        elm(canvasmenuId).style.display = 'none';
+        elm(this.canvasmenuId).style.display = 'none';
         elm("showhide").innerHTML = "Show UI";
         this.hidden = true;
       }
       else{
-        elm(canvasmenuId).style.display = '';
+        elm(this.canvasmenuId).style.display = '';
         elm("showhide").innerHTML = "Hide UI";
         this.hidden = false;
       }
