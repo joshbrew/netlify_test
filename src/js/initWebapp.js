@@ -634,4 +634,8 @@ if (navigator.userAgent.toLowerCase().indexOf("android") >= 0) {
   [...document.styleSheets[0].cssRules].find(x=> x.selectorText=='.modal_content')
   .style.transform='';
 
+  if (chrome.serial || navigator.serial) { //fix for testing on pc
+    document.getElementById("serialmenu").style.display = "none";
+  }
+
 }
