@@ -58,7 +58,7 @@ export class webSerial {
         }
         else if(navigator.serial){
             var frag = document.createDocumentFragment();
-            document.getElementById(parentId).innerHTML = '<button id="refreshSerial">Connect</button>';
+            document.getElementById(parentId).innerHTML = '<button id="refreshSerial">Set USB Device</button>';
             document.getElementById(parentId).appendChild(frag);
         }
             document.getElementById('refreshSerial').onclick = () => {

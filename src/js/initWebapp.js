@@ -555,7 +555,7 @@ if (window.location.hostname !== '192.168.4.1') { // Will not work on an IP
 //---------------------------Serial Additions-----------------------------
 //------------------------------------------------------------------------
  if (chrome.serial || navigator.serial) {
-  var serialHTML = '<div id="serialContainer" class="serialContainer"><h3>Serial Devices:</h3><div id="serialmenu" class="serialmenu"></div></div>';
+  var serialHTML = '<div id="serialContainer" class="serialContainer"><div id="serialmenu" class="serialmenu"></div></div>';
   HEGwebAPI.appendFragment(serialHTML,"main_body");
 
   if(chrome.serial) {
