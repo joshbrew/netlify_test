@@ -7,7 +7,7 @@
   cursor: pointer;
   top: 35px;
   right: 120px;
-  height: 34px;
+  height: 38px;
   opacity: 0.3;
   background-color: black;
   color: white;
@@ -28,7 +28,7 @@
   cursor: pointer;
   top: 35px;
   right: 230px;
-  height: 34px;
+  height: 38px;
   opacity: 0.3;
   background-color: black;
   color: white;
@@ -571,7 +571,7 @@ body, html {
     cursor: pointer;
     padding: 10px;
     font-size: 1.3em;
-    width: 12.5%;
+    width: 150px;
     background-color: black;
     z-index: 995;
 }
