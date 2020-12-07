@@ -94,7 +94,7 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
       newDiv.innerHTML = HTMLtoAppend;
       newDiv.setAttribute("id", parentId + '_child');
 
-      fragment.insertAdjacentHTML('beforeend',newDiv);
+      fragment.insertHTML(newDiv);
 
       elm(parentId).appendChild(fragment);
   }
@@ -113,7 +113,7 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
       newDiv.innerHTML = HTMLtoAppend;
       newDiv.setAttribute("id", parentId + '_child');
 
-      fragment.insertAdjacentHTML('beforeend',newDiv);
+      fragment.appendChild(newDiv);
 
       elm(parentId).appendChild(fragment);
   }
