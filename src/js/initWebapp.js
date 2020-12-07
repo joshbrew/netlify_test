@@ -97,17 +97,18 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
   
   elm('modal_opener').onclick = () => {
     toggleModal(modal,'close_modal','overlay');
-    this.modal2.style.display = 'none';
-    this.modal3.style.display = 'none';
+    modal2.style.display = 'none';
+    modal3.style.display = 'none';
   };
   elm('modal_opener2').onclick = () => {
     toggleModal(modal2,'close_modal2','overlay2');
-    this.modal.style.display = 'none';
-    this.modal3.style.display = 'none';
+    modal.style.display = 'none';
+    modal3.style.display = 'none';
   };
   elm('modal_opener3').onclick = () => {
     toggleModal(modal3,'close_modal3','overlay3');
-    this.modal.style.display = 'none';
+    modal.style.display = 'none';
+    modal2.style.display = 'none';
   };
   
   function toggleHEG(switchElement) {
