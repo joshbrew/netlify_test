@@ -477,9 +477,9 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
   }
   
   // Menu tabs
-  makeTooltip("modal_opener",[50,70],"Session controls, timestamped annotating, save & replay data, host-changing, and an output table");
-  makeTooltip("modal_opener2",[10,70],"Graph perspective controls");
-  makeTooltip("modal_opener3",[10,90],"Various feedback modes. Change the scoring sensitivity settings in the Data menu to change the reactiveness.");
+  makeTooltip("modal_opener",[1,70],"Session controls, timestamped annotating, save & replay data, host-changing, and an output table");
+  makeTooltip("modal_opener2",[1,70],"Graph perspective controls");
+  makeTooltip("modal_opener3",[1,90],"Various feedback modes. Change the scoring sensitivity settings in the Data menu to change the reactiveness.");
   
   // Data options
   makeTooltip("commandrow",[10,100],"See documentation for a command list, not all work over WiFi.");
