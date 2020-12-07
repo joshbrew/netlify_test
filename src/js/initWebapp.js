@@ -629,10 +629,10 @@ if (navigator.userAgent.toLowerCase().indexOf("android") >= 0) {
   document.getElementById("wifibutton").style.top = "5px";
 
   [...document.styleSheets[0].cssRules].find(x=> x.selectorText=='.modal_content')
-    .style.left='12.5%';
+    .style.left='25%';
 
   [...document.styleSheets[0].cssRules].find(x=> x.selectorText=='.modal_content')
-  .style.transform='';
+  .style.transform='translateX(-12.5%)';
 
   if (chrome.serial || navigator.serial) { //fix for testing on pc
     document.getElementById("serialmenu").style.display = "none";
