@@ -141,7 +141,6 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
 
   // Input data and averaging window, output array of moving averages (should be same size as input array, initial values not fully averaged due to window)
   static sma(arr, window) {
-    arr = arr.slice(-1 * window);
     const temp = [];
     
     for (let i = 0; i < arr.length; i++) {
@@ -307,9 +306,10 @@ export class HEGwebAPI { //Create HEG sessions, define custom data stream params
           if (this.clock.length > 5) { // SMA filtering for ratio
             var temp = HEGwebAPI.sma(this.ratio.slice(this.ratio.length - 5, this.ratio.length), 5); 
             //console.log(temp);
+
             if ((this.ratio[this.ratio.length - 1] < temp[4] * 0.7) || (this.ratio[this.ratio.length - 1] > temp[4] * 1.3)) {
               this.ratio[this.ratio.length - 1] = this.ratio[this.ratio.length - 2]; // Roll the ratio back if outside margin 
-              dataArray[rIdx] = temp;
+              dataArray[rIdx] = temp[4];
             } 
             this.filtered.push(dataArray.join(delimiter));
           }
