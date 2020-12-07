@@ -44,6 +44,28 @@
   opacity: 1.0; 
 }
 
+#refreshSerial {
+  position: absolute;
+  cursor: pointer;
+  top: 5px;
+  right: 230px;
+  height: 34px;
+  opacity: 0.3;
+  background-color: black;
+  color: white;
+  border: 2px ridge gray;
+  transition: all 0.2s ease-in-out;
+}
+
+#refreshSerial:active {
+  background-color: darkblue;
+} 
+
+#refreshSerial:hover {
+  opacity: 1.0; 
+}
+
+
 body{
   min-width: 700px;
 }
