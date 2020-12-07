@@ -25,7 +25,7 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
   // ------------------------------Tab Modal Code----------------------------
   // ------------------------------------------------------------------------
   
-  var switchHTML = '<label class="switch"><input type="checkbox" id="togBtn"><div class="startslider round"></div></label>';
+  var switchHTML = '<label id="switch" class="switch"><input type="checkbox" id="togBtn"><div class="startslider round"></div></label>';
 
   var connectHTML = '<button id="wifibutton">WiFi Device</button>';
   
@@ -620,12 +620,12 @@ else if (navigator.userAgent.toLowerCase().indexOf("android") < 0) {
 if (navigator.userAgent.toLowerCase().indexOf("android") >= 0) {
   document.getElementById("wifibutton").style.right = "";
   document.getElementById("blebutton").style.right = "";
-  document.getElementById("serialmenu").style.right = "";
+  document.getElementById("refreshSerial").style.right = "";
   document.getElementById("switch").style.right = "";
 
   document.getElementById("wifibutton").style.left = "480px";
-  document.getElementById("blebutton").style.left = "480px";
-  document.getElementById("serialmenu").style.left = "590px";
+  document.getElementById("blebutton").style.left = "590px";
+  document.getElementById("refreshSerial").style.left = "300px";
   document.getElementById("switch").style.left = "700px";
 
 }
