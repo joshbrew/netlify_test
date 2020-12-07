@@ -520,8 +520,10 @@ if (window.location.hostname !== '192.168.4.1') { // Will not work on an IP
     s.handleEventData(Date.now() + "|" + rawVal)
   });
 
+  makeTooltip("blebutton",[-150,40], "Connect to a device via BLE. Make sure your device was updated after October 2020 for this to work!");
+
   
-  ble.onConnectedCallback = () => {
+  ble.onConnected = () => {
     
     s.removeEventListeners();
 
@@ -615,3 +617,15 @@ else if (navigator.userAgent.toLowerCase().indexOf("android") < 0) {
 //------------------------------------------------------------------------
 
 
+if (navigator.userAgent.toLowerCase().indexOf("android") >= 0) {
+  document.getElementById("wifibutton").style.right = "";
+  document.getElementById("blebutton").style.right = "";
+  document.getElementById("serialmenu").style.right = "";
+  document.getElementById("switch").style.right = "";
+
+  document.getElementById("wifibutton").style.left = "480px";
+  document.getElementById("blebutton").style.left = "480px";
+  document.getElementById("serialmenu").style.left = "590px";
+  document.getElementById("switch").style.left = "700px";
+
+}

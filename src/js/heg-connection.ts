@@ -42,6 +42,8 @@ export class HegConnection {
         
         this.characteristic = await service.getCharacteristic(txUUID);
 
+        this.onConnected();
+
         this.startReading();
     }
 
@@ -57,6 +59,15 @@ export class HegConnection {
     async disconnect() {
         await this.stopReading();
         this.server?.disconnect();
+        this.onDisconnected();
+    }
+
+    onConnected() { //Custom callbacks
+        console.log("BLE device connected!");
+    }
+
+    onDisconnected() {
+        console.log("BLE device disconnected!");
     }
 
     async startReading() {
