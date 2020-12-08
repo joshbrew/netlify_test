@@ -852,7 +852,7 @@ export class graphJS {
     else
       this.graphtext.canvas.height = this.canvas.height;
     
-    this.graphtext.canvas.width = this.canvas.width * 1.3;
+    this.graphtext.canvas.width = this.canvas.width * 1.5;
     this.graphtext.font = "2em Arial";
 
     const cvWidth = this.graphtext.canvas.width;
