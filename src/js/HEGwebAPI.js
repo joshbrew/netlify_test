@@ -652,8 +652,8 @@ export class graphJS {
     this.viewing = 0;
     this.VERTEX_LENGTH = this.nPoints;
 
-    this.graphY1 = [ ...this.VERTEX_LENGTH.fill(0) ];
-    this.graphY2 = [ ...this.VERTEX_LENGTH.fill(0) ];
+    this.graphY1 = new Array(this.VERTEX_LENGTH).fill(0);
+    this.graphY2 = new Array(this.VERTEX_LENGTH).fill(0);
 
     this.xoffset = 0; //Index offset
     this.yoffset = 0;
