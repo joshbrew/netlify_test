@@ -639,3 +639,9 @@ if (navigator.userAgent.toLowerCase().indexOf("android") >= 0) {
   }
 
 }
+
+
+if(window.innerHeight > 750){
+  [...document.styleSheets[0].cssRules].find(x=> x.selectorText=='.webglcss')
+  .style.height='260px';
+}
