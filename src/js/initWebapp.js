@@ -647,3 +647,17 @@ if (navigator.userAgent.toLowerCase().indexOf("android") >= 0) {
   }
 
 }
+
+
+function updateCSS(selector="",props=[],newvalues=[],sheet=0) {
+  if (style.length !== undefined) { //takes an array or single value
+    props.forEach((prop,i) => {
+      [...document.styleSheets[sheet].cssRules].find(x=> x.selectorText==selector)
+        .style[prop]=newvalues[i];
+    });
+  }
+  else { //Else assumed single a style and value set was entered
+    [...document.styleSheets[sheet].cssRules].find(x=> x.selectorText==selector)
+        .style[props]=newvalues;
+  }
+}
