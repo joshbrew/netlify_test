@@ -8,6 +8,14 @@ import { HegConnection } from './heg-connection';
 // Custom Scripts and UI setup, feedback modules must be manually linked to session event data (you can mix and match or write your own easily) 
 // Advanced Client scripts using external packages
 
+
+
+if(window.innerHeight > 750){
+  [...document.styleSheets[0].cssRules].find(x=> x.selectorText=='.webglcss')
+  .style.height='260px';
+}
+
+
 const decoder = new TextDecoder("utf-8");
  
 // Initialize Session - undefined are default values
@@ -638,10 +646,4 @@ if (navigator.userAgent.toLowerCase().indexOf("android") >= 0) {
     document.getElementById("serialmenu").style.display = "none";
   }
 
-}
-
-
-if(window.innerHeight > 750){
-  [...document.styleSheets[0].cssRules].find(x=> x.selectorText=='.webglcss')
-  .style.height='260px';
 }
