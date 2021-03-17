@@ -255,8 +255,8 @@ export class webSerial {
     }
 
     async onPortSelected(port) {
-        try {await port.open({ baudrate: 115200 });}
-        catch (err) { await port.open({ baudRate: 115200}); }
+        try {await port.open({ baudRate: 115200, bufferSize: 2000 }); }
+        catch (err) { await port.open({ baudrate: 115200, buffersize: 2000 }); }
         this.finalCallback();
         this.subscribe(port);
     }
