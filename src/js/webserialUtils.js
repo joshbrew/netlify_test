@@ -12,6 +12,7 @@ export class webSerial {
 
         this.port = null;
         this.decoder = null;
+        this.subscribed = false;
 
         this.monitoring = false;
         this.newSamples = 0;
@@ -20,14 +21,14 @@ export class webSerial {
         this.monitorIdx = 0;
 
         if (chrome.serial) {
-            if(defaultUI == true) {
+            if(defaultUI === true) {
                 this.setupSelect(parentId,false);
             }
             this.setupSerial();
         }
         else if (navigator.serial) {
             this.decoder = new TextDecoder();
-            if(defaultUI == true) {
+            if(defaultUI === true) {
                 this.setupSelect(parentId,true);
             }
         }  
@@ -244,6 +245,7 @@ export class webSerial {
             });
         }
     }
+
     setupSerial() {
         chrome.serial.getDevices(this.onGetDevices);
     }
@@ -255,13 +257,14 @@ export class webSerial {
     }
 
     async onPortSelected(port) {
-        try {await port.open({ baudRate: 115200, bufferSize: 100 }); }
-        catch (err) { await port.open({ baudrate: 115200, buffersize: 100 }); }
+        try {await port.open({ baudRate: 115200, bufferSize: 200 }); }
+        catch (err) { await port.open({ baudrate: 115200, buffersize: 200 }); }
         this.finalCallback();
+        this.subscribed = true;
         this.subscribe(port);
     }
 
-    onReceiveAsync(value){
+    onReceiveAsync(value) {
         this.encodedBuffer += this.decoder.decode(value);
         var index;
         while ((index = this.encodedBuffer.indexOf('\n')) >= 0) {
@@ -278,35 +281,52 @@ export class webSerial {
         }
     }
 
-    async subscribe(port){
-        
-        while (this.port.readable) {
-            const reader = port.readable.getReader();
-            try {
-                while (true) {
-                const { value, done } = await reader.read();
-                if (done) {
-                    // Allow the serial port to be closed later.
-                    reader.releaseLock();
-                    break;
-                }
-                if (value) {
-                    this.onReceiveAsync(value);
-                    //console.log(this.decoder.decode(value));
-                }
-                }
-            } catch (error) {
-                console.log(error);// TODO: Handle non-fatal read error.
-                break;
-            }
-        }
-    }
+	async subscribe(port){
+		if (this.port.readable && this.subscribed === true) {
+			this.reader = port.readable.getReader();
+			const streamData = async () => {
+				try {
+					const { value, done } = await this.reader.read();
+					if (done || this.subscribed === false) {
+						// Allow the serial port to be closed later.
+						await this.reader.releaseLock();
+						
+					}
+					if (value) {
+						//console.log(value.length);
+						try{
+							this.onReceiveAsync(value);
+						}
+						catch (err) {console.log(err)}
+						//console.log("new Read");
+						//console.log(this.decoder.decode(value));
+					}
+					if(this.subscribed === true) {
+						setTimeout(()=>{streamData();}, 10); //10ms delay
+					}
+				} catch (error) {
+					console.error(error);// TODO: Handle non-fatal read error.
+				}
+			}
+			streamData();
+		}
+	}
 
-    async closePort() {
-        await this.port.close();
-        this.port = null; 
-    }
-
+	async closePort(port=this.port) {
+		//if(this.reader) {this.reader.releaseLock();}
+		if(this.port){
+			this.subscribed = false;
+			setTimeout(async () => {
+				if (this.reader) {
+					this.reader = null;
+				}
+				await port.close();
+				this.port = null;
+				this.connected = false;
+				this.onDisconnectedCallback();
+			}, 100);
+		}
+	}
 
     async setupSerialAsync() {
 
@@ -314,7 +334,6 @@ export class webSerial {
             { usbVendorId: 0x10c4, usbProductId: 0x0043 } //CP2102 filter
         ];
 
-        
         this.port = await navigator.serial.requestPort();
         navigator.serial.addEventListener("disconnect",(e) => {
             this.closePort();
