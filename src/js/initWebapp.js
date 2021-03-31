@@ -10,10 +10,9 @@ import { HegConnection } from './heg-connection';
 
 
 
-if(window.innerHeight > 750){
-  [...document.styleSheets[0].cssRules].find(x=> x.selectorText=='.webglcss')
-  .style.height='260px';
-}
+//if(window.innerHeight > 750){ //borked
+//  let style = [...document.styleSheets[0].cssRules].find(x=> x.selectorText=='.webglcss').style.height='260px';
+//}
 
 
 const decoder = new TextDecoder("utf-8");
