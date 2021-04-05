@@ -10,12 +10,12 @@ import { HegConnection } from './heg-connection';
 
 
 
-if(window.innerHeight > 750){ //borked
- let rule = [...document.styleSheets[0].cssRules].find(x => x.selectorText.indexOf('.webglcss') > -1)
-  if(rule) {
-    rule.style.height='260px';
-  }
-}
+// if(window.innerHeight > 750){ //borked
+//  let rule = [...document.styleSheets[0].cssRules].find(x => x.selectorText.indexOf('.webglcss') > -1)
+//   if(rule) {
+//     rule.style.height='260px';
+//   }
+// }
 
 
 const decoder = new TextDecoder("utf-8");
@@ -638,11 +638,11 @@ if (navigator.userAgent.toLowerCase().indexOf("android") >= 0) {
   
   document.getElementById("wifibutton").style.top = "5px";
 
-  let rule1 = [...document.styleSheets[0].cssRules].find(x => x.selectorText.indexOf('.modal_content') > -1)
-  if(rule1) {
-    rule1.style.left='25%';
-    rule1.style.transform='translateX(-12.5%)'
-  }
+  // let rule1 = [...document.styleSheets[0].cssRules].find(x => x.selectorText.indexOf('.modal_content') > -1)
+  // if(rule1) {
+  //   rule1.style.left='25%';
+  //   rule1.style.transform='translateX(-12.5%)'
+  // }
 
   if (chrome.serial || navigator.serial) { //fix for testing on pc
     document.getElementById("serialmenu").style.display = "none";
