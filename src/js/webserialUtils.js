@@ -302,10 +302,24 @@ export class webSerial {
 						//console.log(this.decoder.decode(value));
 					}
 					if(this.subscribed === true) {
-						setTimeout(()=>{streamData();}, 10); //10ms delay
+						setTimeout(()=>{streamData();}, 30); //10ms delay
 					}
 				} catch (error) {
-					console.error(error);// TODO: Handle non-fatal read error.
+					console.log(error);// TODO: Handle non-fatal read error.
+                    if(error.message.includes('parity') || error.message.includes('overflow') || error.message.includes('Parity') || error.message.includes('Overflow') || error.message.includes('break')) {
+                        this.subscribed = false;
+                        setTimeout(async ()=>{
+                            if (this.reader) {
+                                await this.reader.releaseLock();
+                                this.reader = null;
+                            }
+                            this.subscribed = true; 
+                            this.subscribe(port);
+                            //if that fails then close port and reopen it
+                        },30); //try to resubscribe 
+                    } else {
+                        this.closePort();	
+                    }
 				}
 			}
 			streamData();
@@ -318,6 +332,7 @@ export class webSerial {
 			this.subscribed = false;
 			setTimeout(async () => {
 				if (this.reader) {
+                    await this.reader.releaseLock();
 					this.reader = null;
 				}
 				await port.close();
