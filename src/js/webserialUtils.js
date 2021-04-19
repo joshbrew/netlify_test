@@ -306,7 +306,7 @@ export class webSerial {
 					}
 				} catch (error) {
 					console.log(error);// TODO: Handle non-fatal read error.
-                    if(error.message.includes('parity') || error.message.includes('overflow') || error.message.includes('Parity') || error.message.includes('Overflow') || error.message.includes('break')) {
+                    if(error.message.includes('overflow') || error.message.includes('Overflow') || error.message.includes('break')) {
                         this.subscribed = false;
                         setTimeout(async ()=>{
                             if (this.reader) {
@@ -317,6 +317,9 @@ export class webSerial {
                             this.subscribe(port);
                             //if that fails then close port and reopen it
                         },30); //try to resubscribe 
+                    } else if (error.message.includes('parity') || error.message.includes('Parity')) {
+                        this.closePort();
+                        setTimeout(()=>{this.onPortSelected(this.port)},100);
                     } else {
                         this.closePort();	
                     }
@@ -336,7 +339,7 @@ export class webSerial {
 					this.reader = null;
 				}
 				await port.close();
-				this.port = null;
+				//this.port = null;
 				this.connected = false;
 				this.onDisconnectedCallback();
 			}, 100);
