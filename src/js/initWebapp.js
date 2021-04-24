@@ -37,7 +37,7 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
   
   var switchHTML = '<label id="switch" class="switch"><input type="checkbox" id="togBtn"><div class="startslider round"></div></label>';
 
-  var connectHTML = '<button id="wifibutton">WiFi Device</button>';
+  //var connectHTML = '<button id="wifibutton">WiFi Device</button>';
   
   var tabHTML = '<div id="tabContainer"> \
     <button class="tablink" id="modal_opener">Data</button> \
@@ -75,7 +75,7 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
   
   HEGwebAPI.appendFragment(switchHTML, "main_body");
   HEGwebAPI.appendFragment(tabHTML, "main_body");
-  HEGwebAPI.appendFragment(connectHTML, "main_body");
+  //HEGwebAPI.appendFragment(connectHTML, "main_body");
   
   function attachModalListeners(modalElm, closemodal, overlay) {
     elm(closemodal).onclick = () => toggleModal(modalElm, closemodal, overlay);
@@ -131,7 +131,7 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
 
   elm("togBtn").onclick = () => toggleHEG(elm("togBtn"));
 
-  elm("wifibutton").onclick = () => elm("submithost").click();
+  //elm("wifibutton").onclick = () => elm("submithost").click();
 
   // ------------------------------------------------------------------------
   // ------------------------------------------------------------------------
@@ -516,7 +516,7 @@ if((window.location.hostname !== '192.168.4.1') && (window.location.hostname !==
   
   if (useAdvanced === true) makeTooltip("threemode",[300,10],"Turn the Earth! More coming!");
 
-  makeTooltip("wifibutton",[-150,40], "Connect to a device via WiFi, make sure you are connected to its local server or enter its IP in the Data menu if it's on a host network.")
+  //makeTooltip("wifibutton",[-150,40], "Connect to a device via WiFi, make sure you are connected to its local server or enter its IP in the Data menu if it's on a host network.")
 
 //------------------------------------------------------------------------
 //------------------------Bluetooth LE Additions--------------------------
@@ -628,15 +628,15 @@ else if (navigator.userAgent.toLowerCase().indexOf("android") < 0) {
 
 
 if (navigator.userAgent.toLowerCase().indexOf("android") >= 0) {
-  document.getElementById("wifibutton").style.right = "";
+  //document.getElementById("wifibutton").style.right = "";
   document.getElementById("blebutton").style.right = "";
   document.getElementById("switch").style.right = "";
 
-  document.getElementById("wifibutton").style.left = "470px";
+  //document.getElementById("wifibutton").style.left = "470px";
   document.getElementById("blebutton").style.left = "470px";
   document.getElementById("switch").style.left = "600px";
   
-  document.getElementById("wifibutton").style.top = "5px";
+  //document.getElementById("wifibutton").style.top = "5px";
 
   // let rule1 = [...document.styleSheets[0].cssRules].find(x => x.selectorText.indexOf('.modal_content') > -1)
   // if(rule1) {
